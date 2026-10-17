@@ -69,9 +69,11 @@ export type StartupProfile = {
 export type CityComparison = {
   id: string
   user_id: string
+  startup_id?: string | null
   title: string
   cities: string[]
   status: ComparisonStatus
+  scoring_model_version?: string
   created_at: string
   updated_at: string
 }
@@ -88,6 +90,25 @@ export type MarketIndicator = {
   collected_at: string | null
   confidence: ConfidenceLevel
   notes: string | null
+  geographic_scope?: string | null
+  data_period?: string | null
+  is_simulated?: boolean
+  created_at: string
+}
+
+export type Competitor = {
+  id: string
+  city: string
+  name: string
+  category: string
+  offering: string
+  observed_price: number | null
+  price_unit: string | null
+  currency: string
+  source_url: string | null
+  observed_date: string | null
+  notes: string | null
+  is_simulated: boolean
   created_at: string
 }
 
@@ -105,6 +126,10 @@ export type FitScore = {
   criteria: FitScoreCriterion[]
   total_score: number
   max_score: number
+  scoring_model_version?: string
+  evidence_coverage?: number
+  missing_criteria?: string[]
+  insufficient_data?: boolean
   computed_at: string
 }
 
@@ -213,7 +238,9 @@ export type Database = {
       city_comparisons: {
         Row: CityComparison
         Insert: Omit<CityComparison, 'id' | 'created_at' | 'updated_at'> & {
+          startup_id?: string | null
           status?: ComparisonStatus
+          scoring_model_version?: string
           created_at?: string
           updated_at?: string
         }
@@ -228,14 +255,36 @@ export type Database = {
           collected_at?: string | null
           confidence?: ConfidenceLevel
           notes?: string | null
+          geographic_scope?: string | null
+          data_period?: string | null
+          is_simulated?: boolean
           created_at?: string
         }
         Update: Partial<Omit<MarketIndicator, 'id' | 'created_at'>>
         Relationships: []
       }
+      competitors: {
+        Row: Competitor
+        Insert: Omit<Competitor, 'id' | 'created_at'> & {
+          observed_price?: number | null
+          price_unit?: string | null
+          currency?: string
+          source_url?: string | null
+          observed_date?: string | null
+          notes?: string | null
+          is_simulated?: boolean
+          created_at?: string
+        }
+        Update: Partial<Omit<Competitor, 'id' | 'created_at'>>
+        Relationships: []
+      }
       fit_scores: {
         Row: FitScore
         Insert: Omit<FitScore, 'id' | 'computed_at'> & {
+          scoring_model_version?: string
+          evidence_coverage?: number
+          missing_criteria?: string[]
+          insufficient_data?: boolean
           computed_at?: string
         }
         Update: Partial<Omit<FitScore, 'id'>>

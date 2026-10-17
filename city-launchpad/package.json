@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
-    "test": "npx tsx src/lib/validations/__tests__/startupProfile.test.ts"
+    "test": "npx tsx scripts/run-tests.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

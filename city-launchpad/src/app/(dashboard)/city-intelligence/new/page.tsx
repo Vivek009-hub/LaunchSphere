@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { PageShell, PageHeader } from '@/components/layout/PageShell'
@@ -11,7 +11,13 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { SUPPORTED_CITIES, BENCHMARK_INDICATORS } from '@/lib/data/cityData'
-import { DEFAULT_CRITERIA, computeFitScore } from '@/lib/scoring/fitScore'
+import {
+  DEFAULT_CRITERIA,
+  computeFitScore,
+  evaluateCityCriteria,
+  SCORING_MODEL_VERSION,
+} from '@/lib/scoring/fitScore'
+import type { StartupProfile, CityRecord, Competitor, MarketIndicator } from '@/types/database'
 import {
   MapPin,
   Check,
@@ -20,33 +26,94 @@ import {
   ArrowLeft,
   Loader2,
   AlertCircle,
+  Building2,
+  Sliders,
+  ShieldCheck,
+  Info,
 } from 'lucide-react'
 
 export default function NewComparisonPage() {
   const router = useRouter()
   const supabase = createClient()
 
+  const [availableCities, setAvailableCities] = useState<{ name: string; state: string; tier: string }[]>([])
   const [selectedCities, setSelectedCities] = useState<string[]>(['Bengaluru', 'Mumbai'])
   const [title, setTitle] = useState('Bengaluru vs Mumbai Market Fit Comparison')
+  const [profile, setProfile] = useState<StartupProfile | null>(null)
+  const [profileLoading, setProfileLoading] = useState(true)
+
   const [criteria, setCriteria] = useState(
     DEFAULT_CRITERIA.map((c) => ({
       name: c.name,
       weight: c.weight,
+      description: c.description,
     }))
   )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // 1. Load active profile & supported cities from database
+  useEffect(() => {
+    async function loadInitialData() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          // Fetch startup profile
+          const { data: profileData } = await supabase
+            .from('startup_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle()
+
+          if (profileData) {
+            setProfile(profileData)
+            // Pre-select expansion cities if defined
+            if (profileData.expansion_cities && profileData.expansion_cities.length >= 2) {
+              const preselected = profileData.expansion_cities.slice(0, 2)
+              setSelectedCities(preselected)
+              setTitle(`${preselected.join(' vs ')} Market Fit Comparison`)
+            }
+          }
+
+          // Fetch supported cities from catalog
+          const { data: dbCities } = await supabase
+            .from('cities')
+            .select('*')
+            .eq('is_active', true)
+            .order('name')
+
+          if (dbCities && dbCities.length > 0) {
+            setAvailableCities(dbCities.map((c: CityRecord) => ({ name: c.name, state: c.state, tier: c.tier })))
+          } else {
+            setAvailableCities(SUPPORTED_CITIES.map((c) => ({ name: c.name, state: c.state, tier: c.tier })))
+          }
+        }
+      } catch (err) {
+        console.error('Error loading initial comparison data:', err)
+        setAvailableCities(SUPPORTED_CITIES.map((c) => ({ name: c.name, state: c.state, tier: c.tier })))
+      } finally {
+        setProfileLoading(false)
+      }
+    }
+
+    loadInitialData()
+  }, [])
+
   const toggleCity = (cityName: string) => {
     let next: string[]
     if (selectedCities.includes(cityName)) {
       if (selectedCities.length <= 2) {
-        setError('At least 2 cities must be selected for comparison.')
+        setError('At least 2 cities must be selected for a side-by-side comparison.')
         return
       }
       next = selectedCities.filter((c) => c !== cityName)
     } else {
-      next = [...selectedCities, cityName]
+      if (selectedCities.length >= 2) {
+        // Swap second city if already 2 selected for crisp 2-city comparison
+        next = [selectedCities[0], cityName]
+      } else {
+        next = [...selectedCities, cityName]
+      }
     }
     setError(null)
     setSelectedCities(next)
@@ -57,6 +124,16 @@ export default function NewComparisonPage() {
     const updated = [...criteria]
     updated[index].weight = Math.max(0, Math.min(100, val))
     setCriteria(updated)
+  }
+
+  const resetWeights = () => {
+    setCriteria(
+      DEFAULT_CRITERIA.map((c) => ({
+        name: c.name,
+        weight: c.weight,
+        description: c.description,
+      }))
+    )
   }
 
   const totalWeight = criteria.reduce((sum, c) => sum + c.weight, 0)
@@ -75,6 +152,11 @@ export default function NewComparisonPage() {
       return
     }
 
+    if (totalWeight === 0) {
+      setError('Total weight must be greater than 0.')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -85,14 +167,16 @@ export default function NewComparisonPage() {
         return
       }
 
-      // 1. Create city_comparison record
+      // 1. Create city_comparison record with startup link and scoring model version
       const { data: comparison, error: compError } = await supabase
         .from('city_comparisons')
         .insert({
           user_id: user.id,
+          startup_id: profile?.id || null,
           title: title.trim(),
           cities: selectedCities,
           status: 'complete',
+          scoring_model_version: SCORING_MODEL_VERSION,
         })
         .select()
         .single()
@@ -101,7 +185,7 @@ export default function NewComparisonPage() {
         throw new Error(compError?.message || 'Failed to create comparison record.')
       }
 
-      // 2. Insert relevant indicators from benchmark data
+      // 2. Fetch or prepare benchmark indicators with enhanced provenance
       const indicatorsToInsert = BENCHMARK_INDICATORS.filter((ind) =>
         selectedCities.includes(ind.city)
       ).map((ind) => ({
@@ -115,6 +199,9 @@ export default function NewComparisonPage() {
         collected_at: ind.collected_at,
         confidence: ind.confidence,
         notes: ind.notes,
+        geographic_scope: 'metro',
+        data_period: '2023-2024',
+        is_simulated: false,
       }))
 
       if (indicatorsToInsert.length > 0) {
@@ -124,256 +211,249 @@ export default function NewComparisonPage() {
         if (indError) console.error('Error inserting indicators:', indError)
       }
 
-      // 3. Compute and insert Fit Scores for each city
-      // City scores are derived deterministically based on indicators and weights
+      // 3. Fetch competitors for selected cities
+      let dbCompetitors: Competitor[] = []
+      try {
+        const { data: comps } = await supabase
+          .from('competitors')
+          .select('*')
+          .in('city', selectedCities)
+        if (comps) dbCompetitors = comps
+      } catch (err) {
+        console.warn('Competitors catalog fetch skipped:', err)
+      }
+
+      // Build weights map
+      const weightsMap: Record<string, number> = {}
+      criteria.forEach((c) => {
+        weightsMap[c.name] = c.weight
+      })
+
+      // 4. Compute and insert Fit Scores for each city deterministically
       const cityScoresToInsert = selectedCities.map((cityName) => {
-        // Deterministic city criterion scores (0-10 scale) based on sourced indicators
-        const cityCriteria = criteria.map((c) => {
-          let score = 7.0 // baseline
-          let rationale = 'Average baseline for Tier 1 market.'
+        // Transform city market indicators and competitors to criterion scores
+        const evaluatedCriteria = evaluateCityCriteria(
+          cityName,
+          indicatorsToInsert as unknown as MarketIndicator[],
+          dbCompetitors,
+          weightsMap
+        )
 
-          if (c.name.includes('Market Size')) {
-            if (cityName === 'Delhi-NCR') {
-              score = 9.5
-              rationale = 'Largest national urban agglomeration (>32M population).'
-            } else if (cityName === 'Mumbai') {
-              score = 9.0
-              rationale = 'Highest per capita income and dense premium consumer base.'
-            } else if (cityName === 'Bengaluru') {
-              score = 8.0
-              rationale = 'High disposable income and rapid population growth.'
-            } else if (cityName === 'Hyderabad') {
-              score = 7.5
-              rationale = 'Fast-growing metro with high tech adoption.'
-            } else {
-              score = 6.5
-              rationale = 'Moderate metro population with regional catchment.'
-            }
-          } else if (c.name.includes('Digital Infrastructure')) {
-            if (cityName === 'Bengaluru') {
-              score = 9.5
-              rationale = 'Highest national UPI transaction frequency (842/capita/yr).'
-            } else if (cityName === 'Mumbai') {
-              score = 8.8
-              rationale = 'Very high digital merchant scan & transit connectivity.'
-            } else if (cityName === 'Delhi-NCR') {
-              score = 8.5
-              rationale = 'Extensive 5G coverage and high quick-commerce penetration.'
-            } else {
-              score = 7.5
-              rationale = 'High smartphone penetration with growing digital adoption.'
-            }
-          } else if (c.name.includes('Competitive Density')) {
-            if (cityName === 'Bengaluru') {
-              score = 5.5
-              rationale = 'Very high competitor saturation and customer acquisition costs.'
-            } else if (cityName === 'Mumbai') {
-              score = 6.0
-              rationale = 'High commercial brand competition across retail channels.'
-            } else if (cityName === 'Hyderabad' || cityName === 'Pune') {
-              score = 8.0
-              rationale = 'Lower direct saturation; attractive whitespace for new entrants.'
-            } else {
-              score = 7.0
-              rationale = 'Moderate competitive density with room to capture share.'
-            }
-          } else if (c.name.includes('Distribution Access')) {
-            if (cityName === 'Mumbai') {
-              score = 9.2
-              rationale = 'Premier port proximity, highest modern trade density (22.1/100k).'
-            } else if (cityName === 'Delhi-NCR') {
-              score = 8.8
-              rationale = 'Warehousing hub for North India and pan-India logistics spine.'
-            } else if (cityName === 'Bengaluru') {
-              score = 8.0
-              rationale = 'Established modern retail chains and quick-commerce dark stores.'
-            } else {
-              score = 7.0
-              rationale = 'Emerging distribution network with good regional road links.'
-            }
-          } else if (c.name.includes('Talent Availability')) {
-            if (cityName === 'Bengaluru') {
-              score = 9.8
-              rationale = 'Undisputed tech & startup talent concentration in South Asia.'
-            } else if (cityName === 'Delhi-NCR') {
-              score = 8.5
-              rationale = 'Diverse corporate leadership, operations, and marketing talent.'
-            } else if (cityName === 'Hyderabad' || cityName === 'Pune') {
-              score = 8.2
-              rationale = 'Strong engineering universities and competitive wage benchmark.'
-            } else {
-              score = 7.5
-              rationale = 'Solid regional professional and technical workforce.'
-            }
-          } else {
-            // Regulatory / Cost
-            if (cityName === 'Hyderabad') {
-              score = 9.0
-              rationale = 'Single-window government clearances and lower office rents.'
-            } else if (cityName === 'Pune' || cityName === 'Chennai') {
-              score = 8.0
-              rationale = 'Lower living costs and affordable commercial rental benchmarks.'
-            } else if (cityName === 'Bengaluru') {
-              score = 6.5
-              rationale = 'Higher commercial rent and traffic infrastructure friction.'
-            } else if (cityName === 'Mumbai') {
-              score = 5.0
-              rationale = 'Highest commercial rents and operating overhead nationally.'
-            } else {
-              score = 6.8
-              rationale = 'Standard metro regulatory and compliance environment.'
-            }
-          }
-
-          return {
-            name: c.name,
-            weight: c.weight,
-            score,
-            rationale,
-          }
+        // Run deterministic scoring engine v1.0.0
+        const scoringResult = computeFitScore({
+          criteria: evaluatedCriteria,
+          startupContext: profile ? {
+            industry: profile.industry,
+            stage: profile.stage,
+            primary_channel: profile.primary_channel,
+            target_customer: profile.target_customer,
+            price_min: profile.price_min,
+            price_max: profile.price_max,
+          } : undefined,
         })
-
-        const result = computeFitScore({ criteria: cityCriteria })
 
         return {
           comparison_id: comparison.id,
           city: cityName,
-          criteria: cityCriteria,
-          total_score: result.total_score,
-          max_score: result.max_score,
+          criteria: scoringResult.criteria,
+          total_score: scoringResult.total_score || 0,
+          max_score: 100,
+          scoring_model_version: scoringResult.scoring_model_version,
+          evidence_coverage: scoringResult.evidence_coverage,
+          missing_criteria: scoringResult.missing_criteria,
+          insufficient_data: scoringResult.insufficient_data,
         }
       })
 
-      const { error: fitError } = await supabase.from('fit_scores').insert(cityScoresToInsert)
-      if (fitError) console.error('Error inserting fit scores:', fitError)
+      const { error: scoreError } = await supabase
+        .from('fit_scores')
+        .insert(cityScoresToInsert)
 
-      // 4. Redirect to the newly created comparison detail page
+      if (scoreError) {
+        console.error('Error inserting fit scores:', scoreError)
+      }
+
       router.push(`/city-intelligence/${comparison.id}`)
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to initialize comparison.'
-      console.error(err)
+      const message = err instanceof Error ? err.message : 'An error occurred while generating the comparison.'
       setError(message)
       setLoading(false)
     }
   }
+
+  const citiesList = availableCities.length > 0 ? availableCities : SUPPORTED_CITIES
 
   return (
     <PageShell>
       <div className="mb-6">
         <Link
           href="/city-intelligence"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-2"
+          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back to comparisons
         </Link>
         <PageHeader
           title="New City Comparison"
-          description="Evaluate and compare Indian target markets side-by-side using sourced indicators and explainable scoring."
+          description="Evaluate target Indian expansion cities side-by-side using verifiable market indicators, competitive benchmarks, and deterministic scoring."
+          badge={
+            <Badge variant="outline" className="border-emerald-500/40 text-emerald-300 text-xs gap-1">
+              <ShieldCheck className="h-3 w-3" />
+              Scoring Model {SCORING_MODEL_VERSION}
+            </Badge>
+          }
         />
       </div>
 
+      {/* Startup Profile Context Banner */}
+      {!profileLoading && (
+        profile ? (
+          <Card className="mb-6 border-blue-500/30 bg-blue-950/20">
+            <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                  <Building2 className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-blue-400">
+                      Active Startup Profile
+                    </span>
+                    <Badge variant="outline" className="border-blue-500/40 text-blue-300 text-[10px] uppercase">
+                      {profile.stage}
+                    </Badge>
+                  </div>
+                  <h4 className="text-sm font-semibold text-white mt-0.5">
+                    {profile.name} <span className="font-normal text-slate-400">({profile.industry})</span>
+                  </h4>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Target: <span className="text-slate-200">{profile.target_customer}</span> • Channel: <span className="text-slate-200">{profile.primary_channel || 'Direct'}</span>
+                    {profile.price_min && (
+                      <> • Price: <span className="text-slate-200">₹{profile.price_min.toLocaleString('en-IN')}{profile.price_max ? `–₹${profile.price_max.toLocaleString('en-IN')}` : ''}</span></>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <Link href="/settings">
+                <Button size="sm" variant="outline" className="shrink-0 border-blue-500/30 text-blue-200 hover:text-white text-xs">
+                  Change Profile
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="mb-6 border-amber-500/40 bg-amber-950/20">
+            <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-semibold text-white">No Startup Profile Configured</h4>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Complete onboarding to customize Fit Score weights according to your product category, pricing model, and distribution channels.
+                  </p>
+                </div>
+              </div>
+              <Link href="/onboarding">
+                <Button size="sm" className="shrink-0 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold text-xs">
+                  Complete Onboarding
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )
+      )}
+
       {error && (
-        <div className="mb-6 flex items-center gap-2 rounded-lg border border-rose-800/50 bg-rose-950/30 p-4 text-sm text-rose-300">
-          <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+        <div className="mb-6 flex items-center gap-2 rounded-lg border border-rose-500/40 bg-rose-950/20 px-4 py-3 text-sm text-rose-300">
+          <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       <form onSubmit={handleCreate} className="space-y-8">
         {/* Step 1: Comparison Title */}
-        <Card className="border-slate-800 bg-slate-900/60 backdrop-blur">
+        <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600/30 text-xs font-semibold text-blue-400">
+            <CardTitle className="text-base flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
                 1
               </span>
-              <CardTitle className="text-base">Comparison Name</CardTitle>
-            </div>
+              Comparison Title
+            </CardTitle>
             <CardDescription>
-              Give this evaluation a clear name reflecting your startup objective.
+              Give this expansion assessment a memorable title for your team and investment records.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-w-xl">
-              <Label htmlFor="title" className="text-xs text-slate-300">
-                Comparison Title
-              </Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="title" className="text-xs">Assessment Title</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Bengaluru vs Mumbai — D2C Pilot Launch"
+                placeholder="e.g. Bengaluru vs Mumbai Market Fit Comparison"
+                className="max-w-xl"
                 required
-                className="bg-slate-950/70 border-slate-700"
               />
             </div>
           </CardContent>
         </Card>
 
-        {/* Step 2: Select Cities */}
-        <Card className="border-slate-800 bg-slate-900/60 backdrop-blur">
+        {/* Step 2: Choose 2 Supported Cities */}
+        <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600/30 text-xs font-semibold text-blue-400">
-                  2
-                </span>
-                <CardTitle className="text-base">Select Cities to Compare</CardTitle>
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                    2
+                  </span>
+                  Select Target Expansion Cities (Pick 2)
+                </CardTitle>
+                <CardDescription>
+                  Choose two supported Indian cities from the catalog to evaluate side-by-side.
+                </CardDescription>
               </div>
-              <Badge variant="outline" className="border-slate-700 text-slate-300">
-                {selectedCities.length} selected (min 2)
+              <Badge variant="secondary" className="text-xs">
+                {selectedCities.length} selected
               </Badge>
             </div>
-            <CardDescription>
-              Choose 2 or more Indian startup hubs to evaluate against verified benchmark metrics.
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {SUPPORTED_CITIES.map((city) => {
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {citiesList.map((city) => {
                 const isSelected = selectedCities.includes(city.name)
                 return (
                   <div
                     key={city.name}
                     onClick={() => toggleCity(city.name)}
-                    className={`group relative cursor-pointer rounded-xl border p-4 transition-all ${
+                    className={`cursor-pointer rounded-xl border p-4 transition-all ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-950/20 shadow-lg shadow-blue-500/5'
-                        : 'border-slate-800 bg-slate-950/50 hover:border-slate-700 hover:bg-slate-900/40'
+                        ? 'border-blue-500 bg-blue-950/30 ring-1 ring-blue-500/40 shadow-sm'
+                        : 'border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/60'
                     }`}
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <MapPin className={`h-4 w-4 ${isSelected ? 'text-blue-400' : 'text-slate-500'}`} />
-                          <h4 className="font-semibold text-slate-100">{city.name}</h4>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <MapPin className={`h-4 w-4 ${isSelected ? 'text-blue-400' : 'text-slate-500'}`} />
+                        <div>
+                          <p className="text-sm font-semibold text-white">{city.name}</p>
+                          <p className="text-xs text-slate-400">{city.state}</p>
                         </div>
-                        <p className="text-xs text-slate-400 mt-0.5">{city.state}</p>
                       </div>
-                      <div
-                        className={`flex h-5 w-5 items-center justify-center rounded border transition-colors ${
-                          isSelected
-                            ? 'border-blue-500 bg-blue-600 text-white'
-                            : 'border-slate-700 bg-slate-900 text-transparent group-hover:border-slate-600'
-                        }`}
-                      >
-                        <Check className="h-3 w-3" />
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-slate-400 line-clamp-2 mb-3">
-                      {city.tagline}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1">
-                      {city.keyIndustries.slice(0, 3).map((ind) => (
-                        <span
-                          key={ind}
-                          className="rounded bg-slate-800/80 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono"
+                      <div className="flex items-center gap-1.5">
+                        <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">
+                          {city.tier}
+                        </Badge>
+                        <div
+                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                            isSelected
+                              ? 'border-blue-500 bg-blue-600 text-white'
+                              : 'border-slate-700 bg-transparent text-transparent'
+                          }`}
                         >
-                          {ind}
-                        </span>
-                      ))}
+                          <Check className="h-3 w-3" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )
@@ -382,59 +462,79 @@ export default function NewComparisonPage() {
           </CardContent>
         </Card>
 
-        {/* Step 3: Configure Fit Score Criteria Weights */}
-        <Card className="border-slate-800 bg-slate-900/60 backdrop-blur">
+        {/* Step 3: Fit Score Weight Configuration */}
+        <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600/30 text-xs font-semibold text-blue-400">
-                  3
-                </span>
-                <CardTitle className="text-base">Configure Fit Score Weights</CardTitle>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                    3
+                  </span>
+                  Transparent Fit Score Weight Configuration
+                </CardTitle>
+                <CardDescription>
+                  Weights determine the relative importance of each dimension in the deterministic 0–100 Fit Score formula.
+                </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400">Total Weight:</span>
                 <Badge
                   variant={totalWeight === 100 ? 'success' : 'warning'}
-                  className="font-mono text-xs"
+                  className="text-xs font-mono"
                 >
-                  {totalWeight}%
+                  Total Weight: {totalWeight}%
                 </Badge>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={resetWeights}
+                  className="text-xs text-slate-400 hover:text-white"
+                >
+                  Reset Defaults
+                </Button>
               </div>
             </div>
-            <CardDescription>
-              Customize importance weights to match your business model. Fit scores are strictly
-              computed using deterministic formulas without black-box estimations.
-            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-5">
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-xs text-slate-400 flex items-start gap-2">
+              <Info className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
+              <span>
+                <strong>Deterministic Calculation:</strong> Scores are calculated strictly from verifiable market indicators and active profile parameters. Missing indicators are excluded from the weight denominator rather than silently assumed zero.
+              </span>
+            </div>
+
+            <div className="space-y-4 pt-2">
               {criteria.map((c, idx) => (
-                <div
-                  key={c.name}
-                  className="rounded-lg border border-slate-800/80 bg-slate-950/40 p-4 space-y-2"
-                >
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-200">{c.name}</span>
-                    <span className="font-mono text-xs text-blue-400">{c.weight}% weight</span>
+                <div key={c.name} className="rounded-lg border border-slate-800 bg-slate-900/40 p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-0.5">
+                      <Label className="text-sm font-semibold text-white flex items-center gap-2">
+                        {c.name}
+                        <span className="text-xs font-normal text-slate-400">
+                          ({c.weight}%)
+                        </span>
+                      </Label>
+                      <p className="text-xs text-slate-400 leading-relaxed max-w-xl">
+                        {c.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={c.weight}
+                        onChange={(e) => handleWeightChange(idx, parseInt(e.target.value) || 0)}
+                        className="w-20 text-center font-mono text-sm"
+                      />
+                      <span className="text-xs text-slate-500 font-mono">%</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="5"
-                      value={c.weight}
-                      onChange={(e) => handleWeightChange(idx, parseInt(e.target.value) || 0)}
-                      className="w-full accent-blue-500 cursor-pointer h-1.5 bg-slate-800 rounded-lg"
-                    />
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={c.weight}
-                      onChange={(e) => handleWeightChange(idx, parseInt(e.target.value) || 0)}
-                      className="w-20 bg-slate-900 border-slate-700 text-right text-xs"
+                  <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="bg-blue-500 h-full rounded-full transition-all"
+                      style={{ width: `${Math.min(100, (c.weight / (totalWeight || 100)) * 100)}%` }}
                     />
                   </div>
                 </div>
@@ -443,28 +543,28 @@ export default function NewComparisonPage() {
           </CardContent>
         </Card>
 
-        {/* Submit */}
-        <div className="flex items-center justify-between pt-4">
+        {/* Submit Action */}
+        <div className="flex items-center justify-end gap-3 pt-4">
           <Link href="/city-intelligence">
-            <Button type="button" variant="ghost" className="text-slate-400">
+            <Button type="button" variant="ghost" disabled={loading}>
               Cancel
             </Button>
           </Link>
           <Button
             type="submit"
             disabled={loading || selectedCities.length < 2}
-            id="btn-generate-comparison"
-            className="gap-2 bg-blue-600 hover:bg-blue-500 text-white min-w-44"
+            className="gap-2 bg-blue-600 hover:bg-blue-500 text-white min-w-[200px]"
+            id="btn-run-comparison"
           >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Analyzing Cities...
+                Calculating Deterministic Fit...
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4" />
-                Generate Comparison
+                Run Fit Assessment
                 <ArrowRight className="h-4 w-4" />
               </>
             )}

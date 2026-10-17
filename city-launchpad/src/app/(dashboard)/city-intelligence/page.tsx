@@ -111,14 +111,21 @@ export default async function CityIntelligencePage() {
                       {c.cities.join(' vs ')}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-xs text-slate-500">
-                      {new Date(c.created_at).toLocaleDateString('en-IN', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </p>
+                  <CardContent className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span>
+                        {new Date(c.created_at).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </span>
+                      {c.scoring_model_version && (
+                        <Badge variant="outline" className="border-slate-800 text-slate-400 text-[10px] font-mono">
+                          {c.scoring_model_version}
+                        </Badge>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </Link>

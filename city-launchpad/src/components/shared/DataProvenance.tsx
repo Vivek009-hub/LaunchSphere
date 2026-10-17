@@ -11,6 +11,9 @@ interface DataProvenanceProps {
   confidence: ConfidenceLevel
   notes?: string | null
   isDemo?: boolean
+  isSimulated?: boolean
+  geographicScope?: string | null
+  dataPeriod?: string | null
 }
 
 const confidenceConfig: Record<
@@ -30,15 +33,30 @@ export function DataProvenance({
   confidence,
   notes,
   isDemo,
+  isSimulated,
+  geographicScope,
+  dataPeriod,
 }: DataProvenanceProps) {
-  const conf = confidenceConfig[confidence]
+  const conf = confidenceConfig[confidence] || confidenceConfig.medium
   const ConfIcon = conf.icon
 
   return (
-    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-      {isDemo && (
-        <Badge variant="demo" className="text-[10px]">
-          Demo data
+    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-slate-400">
+      {(isDemo || isSimulated) && (
+        <Badge variant="demo" className="text-[10px] uppercase font-mono">
+          Simulated Benchmark
+        </Badge>
+      )}
+
+      {geographicScope && (
+        <Badge variant="outline" className="text-[10px] uppercase font-mono border-slate-700 text-slate-400">
+          Scope: {geographicScope}
+        </Badge>
+      )}
+
+      {dataPeriod && (
+        <Badge variant="outline" className="text-[10px] font-mono border-slate-700 text-slate-400">
+          {dataPeriod}
         </Badge>
       )}
 
