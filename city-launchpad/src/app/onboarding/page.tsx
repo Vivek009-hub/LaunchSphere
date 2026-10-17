@@ -11,7 +11,6 @@ import { Select } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 import { startupProfileSchema } from '@/lib/validations/schemas'
-import { z } from 'zod'
 
 const STAGES = [
   { value: 'idea', label: 'Idea Stage' },

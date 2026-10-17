@@ -1,15 +1,14 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { PageShell, PageHeader } from '@/components/layout/PageShell'
+import { PageShell } from '@/components/layout/PageShell'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { DataProvenance } from '@/components/shared/DataProvenance'
 import { createClient } from '@/lib/supabase/client'
 import type { Contact, IntroductionRequest } from '@/types/database'
 import {
@@ -42,7 +41,6 @@ const categoryIcons = {
 export default function ContactDetailPage() {
   const params = useParams()
   const id = params?.id as string
-  const router = useRouter()
   const supabase = createClient()
 
   const [contact, setContact] = useState<Contact | null>(null)
@@ -51,10 +49,8 @@ export default function ContactDetailPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Introduction form
   const [matchReason, setMatchReason] = useState('')
   const [message, setMessage] = useState('')
-  const [requestSent, setRequestSent] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -91,15 +87,15 @@ export default function ContactDetailPage() {
             `Hi ${contactData.name},\n\nWe are expanding our startup presence to ${contactData.city} and noticed your strong experience with ${contactData.organization || contactData.category}. We would love to explore synergy and share details about our pilot offering.\n\nBest regards,`
           )
         }
-      } catch (err: any) {
-        setError(err?.message || 'Error loading contact.')
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error loading contact.')
       } finally {
         setLoading(false)
       }
     }
 
     loadData()
-  }, [id])
+  }, [id, supabase])
 
   const handleSendIntro = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -128,9 +124,8 @@ export default function ContactDetailPage() {
       if (error) throw error
 
       setExistingRequest(data as IntroductionRequest)
-      setRequestSent(true)
-    } catch (err: any) {
-      alert(`Error submitting request: ${err.message}`)
+    } catch (err: unknown) {
+      alert(`Error submitting request: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setSubmitting(false)
     }

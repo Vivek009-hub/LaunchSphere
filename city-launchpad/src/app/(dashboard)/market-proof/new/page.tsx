@@ -6,9 +6,7 @@ import Link from 'next/link'
 import { PageShell, PageHeader } from '@/components/layout/PageShell'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { assumptionSchema } from '@/lib/validations/schemas'
 import type { AssumptionStatus, AssumptionSourceType } from '@/types/database'
@@ -18,8 +16,6 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
-  HelpCircle,
-  Sparkles,
 } from 'lucide-react'
 
 export default function NewAssumptionPage() {
@@ -67,9 +63,9 @@ export default function NewAssumptionPage() {
       if (insError) throw insError
 
       router.push('/market-proof')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      setError(err?.message || 'Failed to save assumption.')
+      setError(err instanceof Error ? err.message : 'Failed to save assumption.')
       setLoading(false)
     }
   }

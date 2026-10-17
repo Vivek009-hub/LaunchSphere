@@ -15,14 +15,11 @@ import { DEFAULT_CRITERIA, computeFitScore } from '@/lib/scoring/fitScore'
 import {
   MapPin,
   Check,
-  Sliders,
   Sparkles,
   ArrowRight,
   ArrowLeft,
   Loader2,
   AlertCircle,
-  Building2,
-  ShieldCheck,
 } from 'lucide-react'
 
 export default function NewComparisonPage() {
@@ -252,9 +249,10 @@ export default function NewComparisonPage() {
 
       // 4. Redirect to the newly created comparison detail page
       router.push(`/city-intelligence/${comparison.id}`)
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to initialize comparison.'
       console.error(err)
-      setError(err?.message || 'Failed to initialize comparison.')
+      setError(message)
       setLoading(false)
     }
   }

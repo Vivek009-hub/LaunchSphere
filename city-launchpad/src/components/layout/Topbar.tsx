@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Bell, LogOut, User } from 'lucide-react'
+import { Bell, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import type { User as SupabaseUser } from '@supabase/supabase-js'

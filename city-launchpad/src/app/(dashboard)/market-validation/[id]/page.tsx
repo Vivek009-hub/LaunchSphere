@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { PageShell, PageHeader } from '@/components/layout/PageShell'
+import { PageShell } from '@/components/layout/PageShell'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,17 +21,11 @@ import {
   FlaskConical,
   ArrowLeft,
   Plus,
-  PlayCircle,
   CheckCircle2,
-  XCircle,
-  Clock,
   MapPin,
-  Target,
   FileText,
   ExternalLink,
   Loader2,
-  AlertCircle,
-  TrendingUp,
   ShieldCheck,
 } from 'lucide-react'
 
@@ -48,7 +42,6 @@ const outcomeConfig: Record<
 export default function ExperimentDetailPage() {
   const params = useParams()
   const id = params?.id as string
-  const router = useRouter()
   const supabase = createClient()
 
   const [experiment, setExperiment] = useState<Experiment | null>(null)
@@ -67,32 +60,32 @@ export default function ExperimentDetailPage() {
     evidence_url: '',
   })
 
-  const loadData = async () => {
-    if (!id) return
-    setLoading(true)
-
-    try {
-      const [expRes, respRes] = await Promise.all([
-        supabase.from('experiments').select('*').eq('id', id).single(),
-        supabase.from('experiment_responses').select('*').eq('experiment_id', id).order('recorded_at', { ascending: false }),
-      ])
-
-      if (expRes.error || !expRes.data) {
-        setError('Experiment not found.')
-      } else {
-        setExperiment(expRes.data as Experiment)
-        setResponses((respRes.data as ExperimentResponse[]) || [])
-      }
-    } catch (err: any) {
-      setError(err?.message || 'Error loading experiment data.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    if (!id) return
+
+    async function loadData() {
+      setLoading(true)
+      try {
+        const [expRes, respRes] = await Promise.all([
+          supabase.from('experiments').select('*').eq('id', id).single(),
+          supabase.from('experiment_responses').select('*').eq('experiment_id', id).order('recorded_at', { ascending: false }),
+        ])
+
+        if (expRes.error || !expRes.data) {
+          setError('Experiment not found.')
+        } else {
+          setExperiment(expRes.data as Experiment)
+          setResponses((respRes.data as ExperimentResponse[]) || [])
+        }
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Error loading experiment data.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
     loadData()
-  }, [id])
+  }, [id, supabase])
 
   const handleUpdateStatus = async (newStatus: ExperimentStatus) => {
     if (!experiment) return
@@ -104,8 +97,8 @@ export default function ExperimentDetailPage() {
 
       if (error) throw error
       setExperiment({ ...experiment, status: newStatus })
-    } catch (err: any) {
-      alert(`Failed to update status: ${err.message}`)
+    } catch (err: unknown) {
+      alert(`Failed to update status: ${err instanceof Error ? err.message : 'Unknown error'}`)
     }
   }
 
@@ -144,8 +137,8 @@ export default function ExperimentDetailPage() {
       if (experiment?.status === 'planned') {
         handleUpdateStatus('active')
       }
-    } catch (err: any) {
-      alert(`Error logging response: ${err.message}`)
+    } catch (err: unknown) {
+      alert(`Error logging response: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setSubmitting(false)
     }

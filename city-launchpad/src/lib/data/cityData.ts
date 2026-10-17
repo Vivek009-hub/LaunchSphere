@@ -1,4 +1,4 @@
-import type { MarketIndicator, ConfidenceLevel } from '@/types/database'
+import type { ConfidenceLevel } from '@/types/database'
 
 export interface CityProfile {
   name: string

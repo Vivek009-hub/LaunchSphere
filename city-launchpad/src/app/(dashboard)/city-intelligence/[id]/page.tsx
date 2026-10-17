@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { PageShell, PageHeader } from '@/components/layout/PageShell'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { PageShell } from '@/components/layout/PageShell'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { DataProvenance } from '@/components/shared/DataProvenance'
@@ -13,11 +13,9 @@ import {
   TrendingUp,
   ShieldCheck,
   AlertTriangle,
-  ExternalLink,
-  PlusCircle,
   FlaskConical,
 } from 'lucide-react'
-import type { FitScore, MarketIndicator, FitScoreCriterion } from '@/types/database'
+import type { FitScore, FitScoreCriterion } from '@/types/database'
 import { fitScoreColor, fitScoreLabel } from '@/lib/scoring/fitScore'
 
 interface PageProps {

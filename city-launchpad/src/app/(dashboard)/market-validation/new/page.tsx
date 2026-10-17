@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { PageShell, PageHeader } from '@/components/layout/PageShell'
@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/client'
 import { SUPPORTED_CITIES } from '@/lib/data/cityData'
 import { experimentSchema } from '@/lib/validations/schemas'
@@ -19,7 +18,6 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
-  HelpCircle,
   CheckCircle,
 } from 'lucide-react'
 
@@ -120,9 +118,9 @@ export default function NewExperimentPage() {
       })
 
       router.push(`/market-validation/${exp.id}`)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      setError(err?.message || 'Failed to create experiment.')
+      setError(err instanceof Error ? err.message : 'Failed to create experiment.')
       setLoading(false)
     }
   }
