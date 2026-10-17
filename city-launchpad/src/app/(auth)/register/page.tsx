@@ -36,6 +36,7 @@ export default function RegisterPage() {
       password,
       options: {
         data: { name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
 

@@ -72,10 +72,15 @@ export default function ContactDetailPage() {
             : Promise.resolve({ data: null, error: null }),
         ])
 
-        if (cRes.error || !cRes.data) {
+        let contactData = cRes.data as Contact | null
+        if (!contactData) {
+          const { DEMO_CONTACTS } = await import('@/lib/data/demoData')
+          contactData = DEMO_CONTACTS.find((c) => c.id === id) ?? DEMO_CONTACTS[0]
+        }
+
+        if (!contactData) {
           setError('Contact not found.')
         } else {
-          const contactData = cRes.data as Contact
           setContact(contactData)
           if (reqRes.data) {
             setExistingRequest(reqRes.data as IntroductionRequest)

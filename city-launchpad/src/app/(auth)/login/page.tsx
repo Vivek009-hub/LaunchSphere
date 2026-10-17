@@ -1,27 +1,43 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Rocket, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Rocket, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createClient } from '@/lib/supabase/client'
+import { PageLoader } from '@/components/shared/LoadingSpinner'
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    const redirectedFrom = searchParams.get('redirectedFrom')
+
+    if (errorParam === 'auth-callback-failed') {
+      setError('Email verification or authentication callback failed. The link may have expired.')
+    } else if (redirectedFrom) {
+      setError('Please sign in to access your protected dashboard.')
+    }
+  }, [searchParams])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
+
+    // Clear demo mode cookie on real sign in attempt
+    document.cookie = 'demo_mode=; path=/; max-age=0'
 
     const { error: authError } = await supabase.auth.signInWithPassword({
       email,
@@ -39,9 +55,14 @@ export default function LoginPage() {
     router.refresh()
   }
 
+  const handleEnterDemo = () => {
+    document.cookie = 'demo_mode=true; path=/; max-age=86400; SameSite=Lax'
+    router.push('/dashboard')
+    router.refresh()
+  }
+
   return (
     <div className="w-full max-w-md">
-      {/* Card */}
       <div className="gradient-border rounded-2xl bg-slate-900/90 p-8 shadow-2xl backdrop-blur-xl">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
@@ -94,9 +115,10 @@ export default function LoginPage() {
           {error && (
             <div
               role="alert"
-              className="rounded-lg border border-rose-800/50 bg-rose-900/20 px-4 py-3 text-sm text-rose-400"
+              className="flex items-start gap-2 rounded-lg border border-rose-800/50 bg-rose-900/20 px-4 py-3 text-sm text-rose-400"
             >
-              {error}
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
@@ -128,7 +150,27 @@ export default function LoginPage() {
             Create one →
           </Link>
         </p>
+
+        <div className="mt-6 border-t border-slate-800 pt-5 text-center">
+          <button
+            type="button"
+            onClick={handleEnterDemo}
+            id="link-explore-demo"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors"
+          >
+            <span>Explore Demo Prototype (Phase 2)</span>
+            <span>→</span>
+          </button>
+        </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<PageLoader label="Loading sign in..." />}>
+      <LoginForm />
+    </Suspense>
   )
 }

@@ -4,9 +4,12 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { DemoBanner } from '@/components/shared/DemoBanner'
 import Link from 'next/link'
 import { MapPin, Plus, CheckCircle, Clock, AlertCircle } from 'lucide-react'
 import type { Metadata } from 'next'
+import { DEMO_COMPARISONS } from '@/lib/data/demoData'
+import type { CityComparison } from '@/types/database'
 
 export const metadata: Metadata = { title: 'City Intelligence' }
 
@@ -18,24 +21,32 @@ const statusConfig = {
 }
 
 export default async function CityIntelligencePage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let comparisons: CityComparison[] = []
+  let isDemo = false
 
-  const { data: comparisons, error } = await supabase
-    .from('city_comparisons')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false })
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-  if (error) {
-    return (
-      <PageShell>
-        <PageHeader title="City Intelligence" />
-        <div className="rounded-lg border border-rose-800/50 bg-rose-900/10 p-4 text-sm text-rose-400">
-          Failed to load comparisons: {error.message}
-        </div>
-      </PageShell>
-    )
+    if (user) {
+      const { data, error } = await supabase
+        .from('city_comparisons')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (!error && data && data.length > 0) {
+        comparisons = data
+      }
+    }
+  } catch {
+    // Supabase offline / unconfigured
+  }
+
+  // Fallback to demo comparisons for Phase 2 UI prototype
+  if (comparisons.length === 0) {
+    comparisons = DEMO_COMPARISONS
+    isDemo = true
   }
 
   return (
@@ -43,6 +54,13 @@ export default async function CityIntelligencePage() {
       <PageHeader
         title="City Intelligence"
         description="Compare Indian cities using sourced market indicators and generate transparent Fit Scores."
+        badge={
+          isDemo ? (
+            <Badge variant="demo" className="text-xs">
+              Demo Cohorts
+            </Badge>
+          ) : undefined
+        }
         actions={
           <Link href="/city-intelligence/new">
             <Button id="btn-new-comparison">
@@ -53,7 +71,13 @@ export default async function CityIntelligencePage() {
         }
       />
 
-      {(!comparisons || comparisons.length === 0) ? (
+      {isDemo && (
+        <DemoBanner
+          message="Simulated city comparisons. In Phase 3 and Phase 5, newly configured comparisons will be saved to your Supabase project."
+        />
+      )}
+
+      {comparisons.length === 0 ? (
         <EmptyState
           icon={MapPin}
           title="No city comparisons yet"
@@ -70,7 +94,7 @@ export default async function CityIntelligencePage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {comparisons.map((c) => {
-            const status = statusConfig[c.status as keyof typeof statusConfig]
+            const status = statusConfig[c.status as keyof typeof statusConfig] ?? statusConfig.complete
             const StatusIcon = status.icon
             return (
               <Link key={c.id} href={`/city-intelligence/${c.id}`} id={`comparison-${c.id}`}>
@@ -78,7 +102,7 @@ export default async function CityIntelligencePage() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <CardTitle className="text-sm leading-snug">{c.title}</CardTitle>
-                      <Badge variant={status.variant} className="flex-shrink-0 gap-1">
+                      <Badge variant={status.variant} className="flex-shrink-0 gap-1 text-[10px]">
                         <StatusIcon className="h-2.5 w-2.5" />
                         {status.label}
                       </Badge>
@@ -88,8 +112,12 @@ export default async function CityIntelligencePage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-xs text-slate-600">
-                      {new Date(c.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    <p className="text-xs text-slate-500">
+                      {new Date(c.created_at).toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
                     </p>
                   </CardContent>
                 </Card>

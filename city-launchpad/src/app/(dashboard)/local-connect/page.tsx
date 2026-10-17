@@ -4,10 +4,12 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DataProvenance } from '@/components/shared/DataProvenance'
+import { DemoBanner } from '@/components/shared/DemoBanner'
 import Link from 'next/link'
 import { Users, Building2, GraduationCap, Store, Truck, UserCheck } from 'lucide-react'
 import type { Metadata } from 'next'
-import type { Contact, ContactCategory, ConfidenceLevel } from '@/types/database'
+import type { Contact, ContactCategory } from '@/types/database'
+import { DEMO_CONTACTS } from '@/lib/data/demoData'
 
 export const metadata: Metadata = { title: 'Local Connect' }
 
@@ -30,25 +32,29 @@ const categoryColors: Record<ContactCategory, string> = {
 }
 
 export default async function LocalConnectPage() {
-  const supabase = await createClient()
+  let contacts: Contact[] = []
+  let isDemo = false
 
-  // Contacts are publicly readable (no user filter required by RLS)
-  const { data: contacts, error } = await supabase
-    .from('contacts')
-    .select('*')
-    .order('city')
-    .order('category')
-    .limit(50)
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('contacts')
+      .select('*')
+      .order('city')
+      .order('category')
+      .limit(50)
 
-  if (error) {
-    return (
-      <PageShell>
-        <PageHeader title="Local Connect" />
-        <div className="rounded-lg border border-rose-800/50 bg-rose-900/10 p-4 text-sm text-rose-400">
-          Failed to load contacts: {error.message}
-        </div>
-      </PageShell>
-    )
+    if (data && data.length > 0) {
+      contacts = data
+    }
+  } catch {
+    // Supabase unconfigured or offline
+  }
+
+  // Fallback to demo contacts for Phase 2 UI prototype
+  if (contacts.length === 0) {
+    contacts = DEMO_CONTACTS
+    isDemo = true
   }
 
   return (
@@ -56,68 +62,86 @@ export default async function LocalConnectPage() {
       <PageHeader
         title="Local Connect"
         description="Discover retailers, distributors, mentors and ecosystem institutions across Indian cities."
+        badge={
+          isDemo ? (
+            <Badge variant="demo" className="text-xs">
+              Demo Directory
+            </Badge>
+          ) : undefined
+        }
       />
 
-      {(!contacts || contacts.length === 0) ? (
+      {isDemo && (
+        <DemoBanner
+          message="Simulated ecosystem network contacts. In Phase 6, live directory search, contact details, and introduction request dispatching are activated."
+        />
+      )}
+
+      {contacts.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No contacts available yet"
-          description="Run the seed.sql script in Supabase to populate demo contacts, or add contacts via the admin panel."
+          title="No contacts available"
+          description="Local contacts for Indian startup hubs will appear here once seeded."
         />
       ) : (
-        <>
-          <p className="mb-4 text-sm text-slate-500">
-            Showing {contacts.length} contact{contacts.length !== 1 ? 's' : ''}
-            {contacts.some((c: Contact) => c.is_demo) && (
-              <> · <span className="text-amber-500">includes demo data</span></>
-            )}
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {contacts.map((contact: Contact) => {
-              const Icon = categoryIcons[contact.category] ?? Users
-              const colorClass = categoryColors[contact.category] ?? 'text-slate-400'
-              return (
-                <Link key={contact.id} href={`/local-connect/${contact.id}`} id={`contact-${contact.id}`}>
-                  <Card className="h-full cursor-pointer transition-all hover:border-slate-700 hover:-translate-y-0.5">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-start gap-3">
-                        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-slate-800">
-                          <Icon className={`h-4 w-4 ${colorClass}`} />
-                        </div>
-                        <div className="min-w-0">
-                          <CardTitle className="truncate text-sm">{contact.name}</CardTitle>
-                          {contact.organization && (
-                            <CardDescription className="truncate text-xs">
-                              {contact.organization}
-                            </CardDescription>
-                          )}
-                        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {contacts.map((contact) => {
+            const Icon = categoryIcons[contact.category] ?? Users
+            const color = categoryColors[contact.category] ?? 'text-slate-400'
+
+            return (
+              <Card key={contact.id} className="flex flex-col justify-between transition-all hover:border-slate-700">
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800">
+                        <Icon className={`h-4 w-4 ${color}`} />
                       </div>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="flex flex-wrap gap-1">
-                        <Badge variant="outline" className="text-[10px]">{contact.city}</Badge>
-                        <Badge variant="secondary" className="text-[10px] capitalize">{contact.category}</Badge>
-                        {contact.verified && (
-                          <Badge variant="success" className="text-[10px]">Verified</Badge>
-                        )}
+                      <div>
+                        <CardTitle className="text-sm font-semibold">{contact.name}</CardTitle>
+                        <CardDescription className="text-xs">
+                          {contact.role ? `${contact.role} · ` : ''}{contact.organization}
+                        </CardDescription>
                       </div>
-                      {contact.description && (
-                        <p className="line-clamp-2 text-xs text-slate-500">{contact.description}</p>
-                      )}
-                      <DataProvenance
-                        sourceName={contact.source_name}
-                        sourceUrl={contact.source_url}
-                        confidence={contact.verified ? 'medium' : 'unverified' as ConfidenceLevel}
-                        isDemo={contact.is_demo}
-                      />
-                    </CardContent>
-                  </Card>
-                </Link>
-              )
-            })}
-          </div>
-        </>
+                    </div>
+                    <Badge variant="secondary" className="flex-shrink-0 capitalize text-[10px]">
+                      {contact.category.replace('-', ' ')}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 pt-0">
+                  <div className="flex items-center gap-2 text-xs text-slate-400">
+                    <span>{contact.city}</span>
+                    {contact.industry_tags && contact.industry_tags.length > 0 && (
+                      <span className="text-slate-600">· {contact.industry_tags.join(', ')}</span>
+                    )}
+                  </div>
+
+                  {contact.description && (
+                    <p className="text-xs text-slate-400 line-clamp-2">{contact.description}</p>
+                  )}
+
+                  <div className="border-t border-slate-800 pt-2">
+                    <DataProvenance
+                      sourceName={contact.source_name}
+                      sourceUrl={contact.source_url}
+                      confidence={contact.verified ? 'high' : 'medium'}
+                      isDemo={isDemo}
+                    />
+                  </div>
+
+                  <div className="pt-1">
+                    <Link href={`/local-connect/${contact.id}`} id={`contact-${contact.id}`}>
+                      <span className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+                        Request Introduction →
+                      </span>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
       )}
     </PageShell>
   )

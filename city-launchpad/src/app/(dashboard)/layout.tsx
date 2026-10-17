@@ -1,42 +1,63 @@
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
-import { Sidebar } from '@/components/layout/Sidebar'
-import { Topbar } from '@/components/layout/Topbar'
+import { DashboardShell } from '@/components/layout/DashboardShell'
+import { DEMO_PROFILE } from '@/lib/data/demoData'
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const cookieStore = await cookies()
+  const isDemoActive = cookieStore.get('demo_mode')?.value === 'true'
 
-  if (!user) {
-    redirect('/login')
-  }
+  let user = null
+  let profileName = DEMO_PROFILE.name
+  let isDemo = isDemoActive
 
-  // Check if user has completed onboarding
-  const { data: profile } = await supabase
-    .from('startup_profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle()
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getUser()
+    user = data?.user ?? null
 
-  // Redirect to onboarding if no profile yet
-  // (but not if we're already headed there)
-  if (!profile) {
-    redirect('/onboarding')
+    if (user) {
+      // Authenticated user: check startup profile
+      const { data: profile } = await supabase
+        .from('startup_profiles')
+        .select('name')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+      if (profile?.name) {
+        profileName = profile.name
+        isDemo = false
+      } else {
+        // Authenticated user needs onboarding
+        redirect('/onboarding')
+      }
+    } else if (!isDemoActive) {
+      // Unauthenticated and not in demo mode
+      redirect('/login')
+    }
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'digest' in err) {
+      // Re-throw Next.js redirect errors
+      throw err
+    }
+    // Network or credential failure fallback
+    if (!isDemoActive && !user) {
+      redirect('/login')
+    }
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950">
-      <Sidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <Topbar user={user} />
-        <div className="flex-1 overflow-y-auto">
-          {children}
-        </div>
-      </div>
-    </div>
+    <DashboardShell
+      user={user}
+      isDemo={isDemo}
+      startupName={profileName}
+    >
+      {children}
+    </DashboardShell>
   )
 }

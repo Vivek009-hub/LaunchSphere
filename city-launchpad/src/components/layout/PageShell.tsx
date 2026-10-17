@@ -1,4 +1,6 @@
 import React from 'react'
+import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface PageShellProps {
@@ -8,29 +10,76 @@ interface PageShellProps {
 
 export function PageShell({ children, className }: PageShellProps) {
   return (
-    <main className={cn('flex-1 overflow-y-auto bg-slate-950 p-6', className)}>
-      <div className="mx-auto max-w-7xl">{children}</div>
+    <main className={cn('min-h-full bg-slate-950 p-4 sm:p-6 lg:p-8', className)}>
+      <div className="mx-auto max-w-7xl space-y-6">{children}</div>
     </main>
   )
+}
+
+export interface BreadcrumbItem {
+  label: string
+  href?: string
 }
 
 interface PageHeaderProps {
   title: string
   description?: string
   actions?: React.ReactNode
+  breadcrumbs?: BreadcrumbItem[]
+  badge?: React.ReactNode
   className?: string
 }
 
-export function PageHeader({ title, description, actions, className }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  actions,
+  breadcrumbs,
+  badge,
+  className,
+}: PageHeaderProps) {
   return (
-    <div className={cn('mb-6 flex items-start justify-between gap-4', className)}>
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-100">{title}</h2>
+    <div className={cn('flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between', className)}>
+      <div className="space-y-1">
+        {breadcrumbs && breadcrumbs.length > 0 && (
+          <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-1.5 text-xs text-slate-500">
+            {breadcrumbs.map((crumb, idx) => {
+              const isLast = idx === breadcrumbs.length - 1
+              return (
+                <React.Fragment key={crumb.label}>
+                  {idx > 0 && <ChevronRight className="h-3 w-3 text-slate-600" aria-hidden="true" />}
+                  {crumb.href && !isLast ? (
+                    <Link
+                      href={crumb.href}
+                      className="text-slate-400 hover:text-slate-200 transition-colors"
+                    >
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    <span className={cn(isLast ? 'text-slate-200 font-medium' : 'text-slate-500')}>
+                      {crumb.label}
+                    </span>
+                  )}
+                </React.Fragment>
+              )
+            })}
+          </nav>
+        )}
+
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">{title}</h2>
+          {badge}
+        </div>
         {description && (
-          <p className="mt-1 text-sm text-slate-400">{description}</p>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-3xl leading-relaxed">{description}</p>
         )}
       </div>
-      {actions && <div className="flex flex-shrink-0 items-center gap-2">{actions}</div>}
+
+      {actions && (
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto flex-shrink-0">
+          {actions}
+        </div>
+      )}
     </div>
   )
 }

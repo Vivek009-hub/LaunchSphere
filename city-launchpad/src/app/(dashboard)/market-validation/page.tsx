@@ -4,6 +4,7 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { DemoBanner } from '@/components/shared/DemoBanner'
 import Link from 'next/link'
 import { FlaskConical, Plus, PlayCircle, CheckCircle2, XCircle, Clock } from 'lucide-react'
 import type { Metadata } from 'next'
@@ -11,7 +12,10 @@ import type { Experiment, ExperimentStatus } from '@/types/database'
 
 export const metadata: Metadata = { title: 'Market Validation' }
 
-const statusConfig: Record<ExperimentStatus, { label: string; variant: 'secondary' | 'warning' | 'success' | 'destructive'; icon: typeof Clock }> = {
+const statusConfig: Record<
+  ExperimentStatus,
+  { label: string; variant: 'secondary' | 'warning' | 'success' | 'destructive'; icon: typeof Clock }
+> = {
   planned: { label: 'Planned', variant: 'secondary', icon: Clock },
   active: { label: 'Active', variant: 'warning', icon: PlayCircle },
   complete: { label: 'Complete', variant: 'success', icon: CheckCircle2 },
@@ -26,25 +30,84 @@ const methodLabels: Record<string, string> = {
   pilot: 'Pilot Experiment',
 }
 
+const FALLBACK_EXPERIMENTS: Experiment[] = [
+  {
+    id: 'exp-001',
+    user_id: 'demo-user-001',
+    comparison_id: 'comp-001',
+    title: 'Pune & Nashik FPO Willingness-to-Pay Survey',
+    hypothesis: 'FPO directors will commit ₹450/month per storage pod for mobile temperature alert dashboard.',
+    method: 'survey',
+    city: 'Pune',
+    target_metric: 'Willingness to pay',
+    success_threshold: '≥ 50% positive willingness to pay (n=30)',
+    status: 'complete',
+    started_at: '2026-10-01T10:00:00Z',
+    completed_at: '2026-10-12T16:00:00Z',
+    created_at: '2026-10-01T10:00:00Z',
+    updated_at: '2026-10-12T16:00:00Z',
+  },
+  {
+    id: 'exp-002',
+    user_id: 'demo-user-001',
+    comparison_id: 'comp-001',
+    title: 'Bengaluru Fresh Greens Retailer Outreach',
+    hypothesis: 'Premium organic grocery chains will prioritize suppliers with certified temperature-controlled transit logs.',
+    method: 'retailer-outreach',
+    city: 'Bengaluru',
+    target_metric: 'Retailer procurement interest',
+    success_threshold: '8 out of 12 retailers request sample temperature telemetry log',
+    status: 'active',
+    started_at: '2026-10-10T09:00:00Z',
+    completed_at: null,
+    created_at: '2026-10-10T09:00:00Z',
+    updated_at: '2026-10-16T10:30:00Z',
+  },
+  {
+    id: 'exp-003',
+    user_id: 'demo-user-001',
+    comparison_id: 'comp-001',
+    title: 'Indore APMC Mandi Power Reliability Observation',
+    hypothesis: 'Rural mandi grid sheds power under 4 hours daily during peak daytime auction hours.',
+    method: 'pilot',
+    city: 'Indore',
+    target_metric: 'Daily grid uptime',
+    success_threshold: '> 20h uptime without generator fallback',
+    status: 'planned',
+    started_at: null,
+    completed_at: null,
+    created_at: '2026-10-17T09:00:00Z',
+    updated_at: '2026-10-17T09:00:00Z',
+  },
+]
+
 export default async function MarketValidationPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let experiments: Experiment[] = []
+  let isDemo = false
 
-  const { data: experiments, error } = await supabase
-    .from('experiments')
-    .select('*')
-    .eq('user_id', user!.id)
-    .order('created_at', { ascending: false })
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-  if (error) {
-    return (
-      <PageShell>
-        <PageHeader title="Market Validation" />
-        <div className="rounded-lg border border-rose-800/50 bg-rose-900/10 p-4 text-sm text-rose-400">
-          Failed to load experiments: {error.message}
-        </div>
-      </PageShell>
-    )
+    if (user) {
+      const { data } = await supabase
+        .from('experiments')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (data && data.length > 0) {
+        experiments = data
+      }
+    }
+  } catch {
+    // Supabase unconfigured or offline
+  }
+
+  // Demo fallback for Phase 2 UI prototype
+  if (experiments.length === 0) {
+    experiments = FALLBACK_EXPERIMENTS
+    isDemo = true
   }
 
   return (
@@ -52,6 +115,13 @@ export default async function MarketValidationPage() {
       <PageHeader
         title="Market Validation"
         description="Define hypotheses, run experiments, and record real-world evidence. Expressions of interest ≠ purchases."
+        badge={
+          isDemo ? (
+            <Badge variant="demo" className="text-xs">
+              Demo Experiments
+            </Badge>
+          ) : undefined
+        }
         actions={
           <Link href="/market-validation/new">
             <Button id="btn-new-experiment">
@@ -62,7 +132,13 @@ export default async function MarketValidationPage() {
         }
       />
 
-      {(!experiments || experiments.length === 0) ? (
+      {isDemo && (
+        <DemoBanner
+          message="Simulated validation experiments. In Phase 7, live hypothesis creation, response tracking, and outcome scoring are activated."
+        />
+      )}
+
+      {experiments.length === 0 ? (
         <EmptyState
           icon={FlaskConical}
           title="No experiments yet"
@@ -79,7 +155,7 @@ export default async function MarketValidationPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {experiments.map((exp: Experiment) => {
-            const status = statusConfig[exp.status]
+            const status = statusConfig[exp.status] ?? statusConfig.planned
             const StatusIcon = status.icon
             return (
               <Link key={exp.id} href={`/market-validation/${exp.id}`} id={`experiment-${exp.id}`}>
@@ -101,8 +177,8 @@ export default async function MarketValidationPage() {
                         {methodLabels[exp.method] ?? exp.method}
                       </Badge>
                     </div>
-                    <p className="mt-2 text-xs text-slate-600">
-                      Threshold: {exp.success_threshold}
+                    <p className="mt-2 text-xs text-slate-500">
+                      Target: {exp.success_threshold}
                     </p>
                   </CardContent>
                 </Card>

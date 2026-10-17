@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { PageShell, PageHeader } from '@/components/layout/PageShell'
+import { PageLoader } from '@/components/shared/LoadingSpinner'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,7 +50,7 @@ const methodOptions: { value: ExperimentMethod; label: string; desc: string }[] 
   },
 ]
 
-export default function NewExperimentPage() {
+function NewExperimentForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const defaultCity = searchParams.get('city') || 'Bengaluru'
@@ -309,5 +310,13 @@ export default function NewExperimentPage() {
         </div>
       </form>
     </PageShell>
+  )
+}
+
+export default function NewExperimentPage() {
+  return (
+    <Suspense fallback={<PageLoader label="Loading experiment builder…" />}>
+      <NewExperimentForm />
+    </Suspense>
   )
 }
