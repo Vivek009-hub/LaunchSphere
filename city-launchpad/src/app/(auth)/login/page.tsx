@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Rocket, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
@@ -15,21 +15,19 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const errorParam = searchParams.get('error')
+  const redirectedFrom = searchParams.get('redirectedFrom')
+  const initialError =
+    errorParam === 'auth-callback-failed'
+      ? 'Email verification or authentication callback failed. The link may have expired.'
+      : redirectedFrom
+      ? 'Please sign in to access your protected dashboard.'
+      : null
+
+  const [error, setError] = useState<string | null>(initialError)
   const supabase = createClient()
-
-  useEffect(() => {
-    const errorParam = searchParams.get('error')
-    const redirectedFrom = searchParams.get('redirectedFrom')
-
-    if (errorParam === 'auth-callback-failed') {
-      setError('Email verification or authentication callback failed. The link may have expired.')
-    } else if (redirectedFrom) {
-      setError('Please sign in to access your protected dashboard.')
-    }
-  }, [searchParams])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

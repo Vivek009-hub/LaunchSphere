@@ -81,15 +81,95 @@ export const marketIndicatorSchema = z.object({
 export type MarketIndicatorInput = z.infer<typeof marketIndicatorSchema>
 
 // ─── Introduction Request ────────────────────────────────────
-export const introductionRequestSchema = z.object({
-  contact_id: z.string().uuid('Invalid contact ID'),
-  message: z
-    .string()
-    .min(20, 'Please write at least 20 characters explaining why you want to connect')
-    .max(1000),
-  match_reason: z.string().min(1).max(500),
-})
+export const introductionRequestSchema = z
+  .object({
+    contact_id: z.string().uuid('Invalid contact ID'),
+    startup_id: z.string().uuid('Invalid startup ID').optional().nullable(),
+    purpose: z.string().min(3, 'Purpose must be at least 3 characters').max(200).optional(),
+    business_context: z
+      .string()
+      .min(10, 'Business context must be at least 10 characters')
+      .max(1000)
+      .optional(),
+    desired_outcome: z
+      .string()
+      .min(5, 'Desired outcome must be at least 5 characters')
+      .max(500)
+      .optional(),
+    message: z.string().max(2000).optional(),
+    match_reason: z.string().max(500).optional(),
+  })
+  .refine(
+    (data) => {
+      // Accepts either Phase 6 structured fields (purpose + business_context + desired_outcome) or legacy message
+      const hasStructured = Boolean(data.purpose && data.business_context && data.desired_outcome)
+      const hasLegacyMessage = Boolean(data.message && data.message.length >= 20)
+      return hasStructured || hasLegacyMessage
+    },
+    {
+      message:
+        'Please provide introduction purpose, business context, and desired outcome, or a message of at least 20 characters.',
+      path: ['business_context'],
+    }
+  )
+
 export type IntroductionRequestInput = z.infer<typeof introductionRequestSchema>
+
+// ─── Local Connect Discovery Filter ──────────────────────────
+export const localConnectFilterSchema = z.object({
+  query: z.string().max(100).optional(),
+  city: z.string().max(50).optional(),
+  category: z.string().max(50).optional(),
+  industry: z.string().max(50).optional(),
+  verification_status: z.enum(['all', 'unverified', 'source_checked', 'directly_confirmed']).optional(),
+})
+export type LocalConnectFilterInput = z.infer<typeof localConnectFilterSchema>
+
+// ─── Status Lifecycle Transition Rules ────────────────────────
+export type IntroductionStatusType =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'withdrawn'
+  | 'cancelled'
+  | 'completed'
+
+export function isValidStatusTransition(
+  currentStatus: IntroductionStatusType,
+  newStatus: IntroductionStatusType,
+  role: 'founder' | 'recipient' | 'admin' = 'founder'
+): { allowed: boolean; reason?: string } {
+  if (currentStatus === newStatus) {
+    return { allowed: false, reason: 'Request is already in this status' }
+  }
+
+  // Founder can only cancel/withdraw a pending request
+  if (role === 'founder') {
+    if (currentStatus === 'pending' && (newStatus === 'cancelled' || newStatus === 'withdrawn')) {
+      return { allowed: true }
+    }
+    return {
+      allowed: false,
+      reason: `Founders cannot transition a request from '${currentStatus}' to '${newStatus}'. Only pending requests can be cancelled.`,
+    }
+  }
+
+  // Recipient / Admin transitions
+  if (role === 'recipient' || role === 'admin') {
+    if (currentStatus === 'pending' && (newStatus === 'accepted' || newStatus === 'declined')) {
+      return { allowed: true }
+    }
+    if (currentStatus === 'accepted' && newStatus === 'completed') {
+      return { allowed: true }
+    }
+    return {
+      allowed: false,
+      reason: `Invalid transition from '${currentStatus}' to '${newStatus}' for ${role}.`,
+    }
+  }
+
+  return { allowed: false, reason: 'Unauthorized role' }
+}
 
 // ─── Experiment ──────────────────────────────────────────────
 export const experimentSchema = z.object({

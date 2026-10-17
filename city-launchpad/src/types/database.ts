@@ -13,7 +13,16 @@ export type ContactCategory =
   | 'institution'
   | 'supplier'
   | 'pilot-customer'
-export type IntroductionStatus = 'pending' | 'accepted' | 'declined' | 'withdrawn'
+  | 'logistics'
+  | 'service-provider'
+export type VerificationStatus = 'unverified' | 'source_checked' | 'directly_confirmed'
+export type IntroductionStatus =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'withdrawn'
+  | 'cancelled'
+  | 'completed'
 export type ExperimentMethod =
   | 'interview'
   | 'survey'
@@ -141,22 +150,34 @@ export type Contact = {
   role: string | null
   category: ContactCategory
   industry_tags: string[]
+  capabilities?: string[]
+  service_area?: string | null
   description: string | null
+  website_url?: string | null
   source_name: string
   source_url: string | null
   verified: boolean
   verified_at: string | null
+  verification_status: VerificationStatus
   is_demo: boolean
   created_at: string
+  updated_at?: string
 }
 
 export type IntroductionRequest = {
   id: string
   user_id: string
   contact_id: string
+  startup_id?: string | null
+  purpose?: string | null
+  business_context?: string | null
+  desired_outcome?: string | null
   message: string
   status: IntroductionStatus
   match_reason: string
+  responded_at?: string | null
+  response_note?: string | null
+  recipient_id?: string | null
   created_at: string
   updated_at: string
   contact?: Contact
@@ -292,27 +313,45 @@ export type Database = {
       }
       contacts: {
         Row: Contact
-        Insert: Omit<Contact, 'id' | 'created_at' | 'organization' | 'role' | 'description' | 'source_url' | 'verified_at'> & {
+        Insert: Omit<Contact, 'id' | 'created_at' | 'organization' | 'role' | 'description' | 'source_url' | 'verified_at' | 'verification_status'> & {
           organization?: string | null
           role?: string | null
+          capabilities?: string[]
+          service_area?: string | null
           description?: string | null
+          website_url?: string | null
           source_url?: string | null
           verified?: boolean
           verified_at?: string | null
+          verification_status?: VerificationStatus
           is_demo?: boolean
           created_at?: string
+          updated_at?: string
         }
         Update: Partial<Omit<Contact, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      local_resources: {
+        Row: Contact
+        Insert: never
+        Update: never
         Relationships: []
       }
       introduction_requests: {
         Row: IntroductionRequest
         Insert: Omit<IntroductionRequest, 'id' | 'created_at' | 'updated_at' | 'contact' | 'status'> & {
+          startup_id?: string | null
+          purpose?: string | null
+          business_context?: string | null
+          desired_outcome?: string | null
           status?: IntroductionStatus
+          responded_at?: string | null
+          response_note?: string | null
+          recipient_id?: string | null
           created_at?: string
           updated_at?: string
         }
-        Update: Partial<Omit<IntroductionRequest, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'contact'>>
+        Update: Partial<Omit<IntroductionRequest, 'id' | 'user_id' | 'contact'>>
         Relationships: []
       }
       experiments: {

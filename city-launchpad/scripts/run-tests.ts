@@ -1,5 +1,7 @@
 import { runStartupProfileValidationTests } from '../src/lib/validations/__tests__/startupProfile.test'
 import { runFitScoreTests } from '../src/lib/scoring/__tests__/fitScore.test'
+import { runLocalConnectMatchingTests } from '../src/lib/scoring/__tests__/localConnectMatching.test'
+import { runIntroductionRequestValidationTests } from '../src/lib/validations/__tests__/introductionRequest.test'
 
 console.log('====================================================')
 console.log('   CITY LAUNCHPAD — COMPREHENSIVE TEST RUNNER')
@@ -8,8 +10,10 @@ console.log('====================================================')
 try {
   runStartupProfileValidationTests()
   runFitScoreTests()
+  runLocalConnectMatchingTests()
+  runIntroductionRequestValidationTests()
   console.log('====================================================')
-  console.log('  ALL TEST SUITES PASSED SUCCESSFULLY (32/32 TESTS)')
+  console.log('  ALL TEST SUITES PASSED SUCCESSFULLY')
   console.log('====================================================\n')
   process.exit(0)
 } catch (error) {
