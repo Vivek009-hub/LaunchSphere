@@ -34,6 +34,15 @@ export type EvidenceDirection = 'supports' | 'challenges' | 'neutral'
 
 // ─── Tables ───────────────────────────────────────────────────
 
+export type CityRecord = {
+  id: string
+  name: string
+  state: string
+  tier: string
+  is_active: boolean
+  created_at: string
+}
+
 export type StartupProfile = {
   id: string
   user_id: string
@@ -42,6 +51,17 @@ export type StartupProfile = {
   stage: StartupStage
   target_customer: string
   product_desc: string
+  business_description?: string | null
+  current_city?: string | null
+  price_min?: number | null
+  price_max?: number | null
+  primary_channel?: string | null
+  website_url?: string | null
+  product_category?: string | null
+  target_geography?: string | null
+  expansion_cities?: string[]
+  traction_summary?: string | null
+  expansion_context?: string | null
   created_at: string
   updated_at: string
 }
@@ -171,6 +191,16 @@ export type AssumptionEvidence = {
 export type Database = {
   public: {
     Tables: {
+      cities: {
+        Row: CityRecord
+        Insert: Omit<CityRecord, 'id' | 'created_at'> & {
+          tier?: string
+          is_active?: boolean
+          created_at?: string
+        }
+        Update: Partial<Omit<CityRecord, 'id' | 'created_at'>>
+        Relationships: []
+      }
       startup_profiles: {
         Row: StartupProfile
         Insert: Omit<StartupProfile, 'id' | 'created_at' | 'updated_at'> & {

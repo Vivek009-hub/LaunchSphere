@@ -1,19 +1,59 @@
 import { z } from 'zod'
 
 // ─── Startup Profile ──────────────────────────────────────────
-export const startupProfileSchema = z.object({
-  name: z.string().min(2, 'Startup name must be at least 2 characters').max(100),
-  industry: z.string().min(2, 'Industry is required').max(100),
-  stage: z.enum(['idea', 'pre-seed', 'seed', 'series-a']),
-  target_customer: z
-    .string()
-    .min(10, 'Describe your target customer (at least 10 characters)')
-    .max(500),
-  product_desc: z
-    .string()
-    .min(20, 'Describe your product (at least 20 characters)')
-    .max(2000),
-})
+export const startupProfileSchema = z
+  .object({
+    name: z.string().min(2, 'Startup name must be at least 2 characters').max(100),
+    business_description: z
+      .string()
+      .min(10, 'Business description must be at least 10 characters')
+      .max(500),
+    industry: z.string().min(2, 'Industry is required').max(100),
+    stage: z.enum(['idea', 'pre-seed', 'seed', 'series-a']),
+    product_desc: z
+      .string()
+      .min(10, 'Describe your product (at least 10 characters)')
+      .max(2000),
+    target_customer: z
+      .string()
+      .min(5, 'Describe your target customer (at least 5 characters)')
+      .max(500),
+    current_city: z.string().min(1, 'Current operating city is required').max(100),
+    price_min: z
+      .preprocess(
+        (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+        z.number().min(0, 'Price must be non-negative').optional()
+      ),
+    price_max: z
+      .preprocess(
+        (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+        z.number().min(0, 'Price must be non-negative').optional()
+      ),
+    primary_channel: z.string().min(2, 'Primary distribution channel is required').max(100),
+    website_url: z
+      .string()
+      .url('Must be a valid URL (e.g. https://yourstartup.com)')
+      .optional()
+      .or(z.literal('')),
+    product_category: z.string().max(100).optional().or(z.literal('')),
+    target_geography: z.string().max(200).optional().or(z.literal('')),
+    expansion_cities: z.array(z.string()).default([]),
+    traction_summary: z.string().max(500).optional().or(z.literal('')),
+    expansion_context: z.string().max(1000).optional().or(z.literal('')),
+  })
+  .refine(
+    (data) => {
+      if (data.price_min !== undefined && data.price_max !== undefined) {
+        return data.price_min <= data.price_max
+      }
+      return true
+    },
+    {
+      message: 'Minimum price cannot exceed maximum price',
+      path: ['price_min'],
+    }
+  )
+
 export type StartupProfileInput = z.infer<typeof startupProfileSchema>
 
 // ─── City Comparison ─────────────────────────────────────────
