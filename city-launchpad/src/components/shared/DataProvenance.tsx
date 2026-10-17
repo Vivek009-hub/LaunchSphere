@@ -1,0 +1,77 @@
+import React from 'react'
+import { ExternalLink, Calendar, ShieldAlert, ShieldCheck, Info } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { formatDate } from '@/lib/utils'
+import type { ConfidenceLevel } from '@/types/database'
+
+interface DataProvenanceProps {
+  sourceName: string
+  sourceUrl?: string | null
+  collectedAt?: string | null
+  confidence: ConfidenceLevel
+  notes?: string | null
+  isDemo?: boolean
+}
+
+const confidenceConfig: Record<
+  ConfidenceLevel,
+  { label: string; variant: 'success' | 'default' | 'warning' | 'unverified'; icon: typeof ShieldCheck }
+> = {
+  high: { label: 'High confidence', variant: 'success', icon: ShieldCheck },
+  medium: { label: 'Medium confidence', variant: 'default', icon: Info },
+  low: { label: 'Low confidence', variant: 'warning', icon: ShieldAlert },
+  unverified: { label: 'Unverified', variant: 'unverified', icon: ShieldAlert },
+}
+
+export function DataProvenance({
+  sourceName,
+  sourceUrl,
+  collectedAt,
+  confidence,
+  notes,
+  isDemo,
+}: DataProvenanceProps) {
+  const conf = confidenceConfig[confidence]
+  const ConfIcon = conf.icon
+
+  return (
+    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+      {isDemo && (
+        <Badge variant="demo" className="text-[10px]">
+          Demo data
+        </Badge>
+      )}
+
+      <Badge variant={conf.variant} className="gap-1 text-[10px]">
+        <ConfIcon className="h-2.5 w-2.5" />
+        {conf.label}
+      </Badge>
+
+      <span className="flex items-center gap-1">
+        Source:{' '}
+        {sourceUrl ? (
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 hover:underline"
+          >
+            {sourceName}
+            <ExternalLink className="h-2.5 w-2.5" />
+          </a>
+        ) : (
+          <span className="text-slate-400">{sourceName}</span>
+        )}
+      </span>
+
+      {collectedAt && (
+        <span className="flex items-center gap-1">
+          <Calendar className="h-2.5 w-2.5" />
+          {formatDate(collectedAt)}
+        </span>
+      )}
+
+      {notes && <span className="italic text-slate-600">· {notes}</span>}
+    </div>
+  )
+}
