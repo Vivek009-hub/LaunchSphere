@@ -23,19 +23,52 @@ export type IntroductionStatus =
   | 'withdrawn'
   | 'cancelled'
   | 'completed'
+export type HypothesisStatus =
+  | 'untested'
+  | 'testing'
+  | 'supported'
+  | 'challenged'
+  | 'inconclusive'
 export type ExperimentMethod =
   | 'interview'
   | 'survey'
   | 'retailer-outreach'
+  | 'distributor-outreach'
   | 'landing-page'
   | 'pilot'
-export type ExperimentStatus = 'planned' | 'active' | 'complete' | 'cancelled'
+  | 'paid-trial'
+  | 'other'
+export type ExperimentStatus =
+  | 'draft'
+  | 'planned'
+  | 'active'
+  | 'running'
+  | 'complete'
+  | 'completed'
+  | 'cancelled'
+export type ThresholdOperator = '>=' | '>' | '<=' | '<' | '='
+export type ThresholdUnit = '%' | 'count' | 'INR' | 'ratio'
+export type OutcomeInterpretation =
+  | 'threshold_met'
+  | 'threshold_not_met'
+  | 'insufficient_sample'
+  | 'inconclusive'
+  | 'not_evaluated'
+export type SignalTier =
+  | 'reported_interest'
+  | 'qualified_lead'
+  | 'signup'
+  | 'paid_order'
+  | 'repeat_purchase'
+  | 'objection'
 export type ResponseType =
   | 'interview'
   | 'survey-submission'
   | 'observation'
   | 'purchase'
   | 'signup'
+  | 'lead'
+  | 'inquiry'
 export type OutcomeType = 'positive' | 'negative' | 'neutral' | 'inconclusive'
 export type AssumptionSourceType = 'city-intelligence' | 'manual' | 'llm-synthesis'
 export type AssumptionStatus = 'untested' | 'supported' | 'challenged' | 'invalidated'
@@ -183,32 +216,81 @@ export type IntroductionRequest = {
   contact?: Contact
 }
 
+export type Hypothesis = {
+  id: string
+  user_id: string
+  startup_id?: string | null
+  city: string
+  statement: string
+  target_audience: string
+  problem_statement: string
+  expected_behavior: string
+  strategic_rationale?: string | null
+  status: HypothesisStatus
+  comparison_id?: string | null
+  is_demo?: boolean
+  created_at: string
+  updated_at: string
+}
+
 export type Experiment = {
   id: string
   user_id: string
-  comparison_id: string | null
+  startup_id?: string | null
+  hypothesis_id?: string | null
+  comparison_id?: string | null
   title: string
   hypothesis: string
+  objective?: string | null
   method: ExperimentMethod
   city: string
+  target_audience?: string | null
+  sample_size_target?: number
+  start_date?: string | null
+  end_date?: string | null
   target_metric: string
   success_threshold: string
+  threshold_metric?: string
+  threshold_operator?: ThresholdOperator
+  threshold_target?: number
+  threshold_unit?: ThresholdUnit
+  threshold_min_sample?: number
+  threshold_rationale?: string | null
   status: ExperimentStatus
-  started_at: string | null
-  completed_at: string | null
+  outcome_interpretation?: OutcomeInterpretation
+  notes?: string | null
+  is_demo?: boolean
+  started_at?: string | null
+  completed_at?: string | null
   created_at: string
   updated_at: string
+  hypothesis_rel?: Hypothesis | null
 }
 
 export type ExperimentResponse = {
   id: string
   experiment_id: string
+  user_id?: string
   respondent_label: string
   response_type: ResponseType
   outcome: OutcomeType
-  notes: string | null
-  evidence_url: string | null
+  signal_tier?: SignalTier
+  units_count?: number
+  financial_value?: number | null
+  notes?: string | null
+  evidence_url?: string | null
+  rejection_reason?: string | null
   recorded_at: string
+}
+
+export type ThresholdHistory = {
+  id: string
+  experiment_id: string
+  user_id: string
+  previous_threshold: string
+  new_threshold: string
+  change_reason?: string | null
+  changed_at: string
 }
 
 export type Assumption = {
@@ -354,9 +436,18 @@ export type Database = {
         Update: Partial<Omit<IntroductionRequest, 'id' | 'user_id' | 'contact'>>
         Relationships: []
       }
+      hypotheses: {
+        Row: Hypothesis
+        Insert: Omit<Hypothesis, 'id' | 'created_at' | 'updated_at'> & {
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<Hypothesis, 'id' | 'user_id' | 'created_at'>>
+        Relationships: []
+      }
       experiments: {
         Row: Experiment
-        Insert: Omit<Experiment, 'id' | 'created_at' | 'updated_at' | 'comparison_id' | 'started_at' | 'completed_at' | 'status'> & {
+        Insert: Omit<Experiment, 'id' | 'created_at' | 'updated_at' | 'comparison_id' | 'started_at' | 'completed_at' | 'status' | 'hypothesis_rel'> & {
           comparison_id?: string | null
           status?: ExperimentStatus
           started_at?: string | null
@@ -364,7 +455,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Update: Partial<Omit<Experiment, 'id' | 'user_id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Experiment, 'id' | 'user_id' | 'created_at' | 'hypothesis_rel'>>
         Relationships: []
       }
       experiment_responses: {
@@ -377,6 +468,14 @@ export type Database = {
         Update: Partial<Omit<ExperimentResponse, 'id'>>
         Relationships: []
       }
+      threshold_history: {
+        Row: ThresholdHistory
+        Insert: Omit<ThresholdHistory, 'id' | 'changed_at'> & {
+          changed_at?: string
+        }
+        Update: Partial<Omit<ThresholdHistory, 'id' | 'experiment_id' | 'user_id' | 'changed_at'>>
+        Relationships: []
+      }
       assumptions: {
         Row: Assumption
         Insert: Omit<Assumption, 'id' | 'created_at' | 'updated_at' | 'comparison_id' | 'status' | 'source_type'> & {
@@ -386,7 +485,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Update: Partial<Omit<Assumption, 'id' | 'user_id' | 'created_at' | 'updated_at'>>
+        Update: Partial<Omit<Assumption, 'id' | 'user_id' | 'created_at'>>
         Relationships: []
       }
       assumption_evidence: {

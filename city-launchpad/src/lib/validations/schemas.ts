@@ -171,26 +171,107 @@ export function isValidStatusTransition(
   return { allowed: false, reason: 'Unauthorized role' }
 }
 
+// ─── Hypothesis ──────────────────────────────────────────────
+export const hypothesisSchema = z.object({
+  statement: z
+    .string()
+    .min(10, 'Hypothesis statement must be at least 10 characters')
+    .max(500),
+  city: z.string().min(1, 'Target city is required').max(100),
+  target_audience: z
+    .string()
+    .min(3, 'Target customer segment must be at least 3 characters')
+    .max(200),
+  problem_statement: z
+    .string()
+    .min(10, 'Problem/need description must be at least 10 characters')
+    .max(1000),
+  expected_behavior: z
+    .string()
+    .min(10, 'Expected customer behavior must be at least 10 characters')
+    .max(1000),
+  strategic_rationale: z.string().max(1000).optional(),
+  status: z
+    .enum(['untested', 'testing', 'supported', 'challenged', 'inconclusive'])
+    .default('untested'),
+  startup_id: z.string().optional().nullable(),
+  comparison_id: z.string().optional().nullable(),
+})
+export type HypothesisInput = z.infer<typeof hypothesisSchema>
+
 // ─── Experiment ──────────────────────────────────────────────
 export const experimentSchema = z.object({
-  title: z.string().min(3).max(200),
+  title: z.string().min(3, 'Experiment title must be at least 3 characters').max(200),
   hypothesis: z
     .string()
-    .min(20, 'Hypothesis must be at least 20 characters')
+    .min(10, 'Hypothesis description must be at least 10 characters')
     .max(1000),
-  method: z.enum(['interview', 'survey', 'retailer-outreach', 'landing-page', 'pilot']),
-  city: z.string().min(1, 'City is required'),
-  target_metric: z.string().min(5, 'Describe the metric you will measure').max(200),
+  hypothesis_id: z.string().optional().nullable(),
+  method: z.enum([
+    'interview',
+    'survey',
+    'retailer-outreach',
+    'distributor-outreach',
+    'landing-page',
+    'pilot',
+    'paid-trial',
+    'other',
+  ]),
+  city: z.string().min(1, 'Target city is required'),
+  target_audience: z.string().max(200).optional(),
+  sample_size_target: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? 10 : Number(val)),
+      z.number().int().min(1, 'Sample size target must be at least 1')
+    )
+    .default(10),
+  start_date: z.string().optional().nullable(),
+  end_date: z.string().optional().nullable(),
+  target_metric: z.string().min(2, 'Target metric name is required').max(200),
   success_threshold: z
     .string()
-    .min(5, 'Define a measurable success threshold')
+    .min(3, 'Define a measurable success threshold')
     .max(200),
-  comparison_id: z.string().uuid().optional().nullable(),
+  threshold_metric: z.string().default('problem_confirmation_rate'),
+  threshold_operator: z.enum(['>=', '>', '<=', '<', '=']).default('>='),
+  threshold_target: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? 50 : Number(val)),
+      z.number()
+    )
+    .default(50),
+  threshold_unit: z.enum(['%', 'count', 'INR', 'ratio']).default('%'),
+  threshold_min_sample: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? 5 : Number(val)),
+      z.number().int().min(1)
+    )
+    .default(5),
+  threshold_rationale: z.string().max(1000).optional(),
+  status: z
+    .enum(['draft', 'planned', 'active', 'running', 'complete', 'completed', 'cancelled'])
+    .default('planned'),
+  notes: z.string().max(2000).optional(),
+  comparison_id: z.string().optional().nullable(),
+  startup_id: z.string().optional().nullable(),
 })
 export type ExperimentInput = z.infer<typeof experimentSchema>
 
+// ─── Threshold Update Schema ──────────────────────────────────
+export const thresholdUpdateSchema = z.object({
+  experiment_id: z.string().min(1, 'Invalid experiment ID'),
+  previous_threshold: z.string().min(1),
+  new_threshold: z.string().min(3, 'New threshold must be at least 3 characters'),
+  change_reason: z
+    .string()
+    .min(5, 'Please provide an explicit rationale for modifying this success threshold')
+    .max(500),
+})
+export type ThresholdUpdateInput = z.infer<typeof thresholdUpdateSchema>
+
 // ─── Experiment Response ──────────────────────────────────────
 export const experimentResponseSchema = z.object({
+  experiment_id: z.string().min(1, 'Invalid experiment ID').optional(),
   respondent_label: z
     .string()
     .min(1, 'Label required')
@@ -202,10 +283,34 @@ export const experimentResponseSchema = z.object({
     'observation',
     'purchase',
     'signup',
+    'lead',
+    'inquiry',
   ]),
   outcome: z.enum(['positive', 'negative', 'neutral', 'inconclusive']),
+  signal_tier: z
+    .enum([
+      'reported_interest',
+      'qualified_lead',
+      'signup',
+      'paid_order',
+      'repeat_purchase',
+      'objection',
+    ])
+    .default('reported_interest'),
+  units_count: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? 1 : Number(val)),
+      z.number().int().min(1)
+    )
+    .default(1),
+  financial_value: z
+    .preprocess(
+      (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+      z.number().min(0).optional()
+    ),
   notes: z.string().max(2000).optional(),
-  evidence_url: z.string().url().optional().or(z.literal('')),
+  rejection_reason: z.string().max(500).optional(),
+  evidence_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 })
 export type ExperimentResponseInput = z.infer<typeof experimentResponseSchema>
 
