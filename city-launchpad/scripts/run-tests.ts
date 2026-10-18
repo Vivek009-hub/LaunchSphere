@@ -4,6 +4,7 @@ import { runLocalConnectMatchingTests } from '../src/lib/scoring/__tests__/local
 import { runIntroductionRequestValidationTests } from '../src/lib/validations/__tests__/introductionRequest.test'
 import { runMarketValidationMetricsTests } from '../src/lib/scoring/__tests__/marketValidationMetrics.test'
 import { runMarketValidationSchemaTests } from '../src/lib/validations/__tests__/marketValidation.test'
+import { runMarketProofClassifierTests } from '../src/lib/scoring/__tests__/marketProofClassifier.test'
 
 console.log('====================================================')
 console.log('   CITY LAUNCHPAD — COMPREHENSIVE TEST RUNNER')
@@ -16,6 +17,7 @@ try {
   runIntroductionRequestValidationTests()
   runMarketValidationMetricsTests()
   runMarketValidationSchemaTests()
+  runMarketProofClassifierTests()
   console.log('====================================================')
   console.log('  ALL TEST SUITES PASSED SUCCESSFULLY')
   console.log('====================================================\n')

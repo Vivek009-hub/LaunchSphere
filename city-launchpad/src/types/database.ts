@@ -314,6 +314,42 @@ export type AssumptionEvidence = {
   linked_at: string
 }
 
+// ─── Phase 8: Market Proof Loop ───────────────────────────────
+
+export type ProofEventType =
+  | 'assessment_created'
+  | 'assessment_refreshed'
+  | 'hypothesis_created'
+  | 'hypothesis_status_changed'
+  | 'intro_request_created'
+  | 'intro_request_updated'
+  | 'experiment_started'
+  | 'experiment_completed'
+  | 'response_recorded'
+  | 'evidence_linked'
+
+export type HypothesisIntroLink = {
+  id: string
+  hypothesis_id: string
+  intro_request_id: string
+  user_id: string
+  created_at: string
+}
+
+export type ProofEvent = {
+  id: string
+  user_id: string
+  hypothesis_id: string | null
+  startup_id: string | null
+  city: string | null
+  event_type: ProofEventType
+  event_label: string
+  related_record_type: string | null
+  related_record_id: string | null
+  metadata: Record<string, unknown>
+  occurred_at: string
+}
+
 // ─── Supabase Database type ───────────────────────────────────
 // Defined as type alias so all Row types satisfy Record<string, unknown>
 export type Database = {
@@ -497,6 +533,22 @@ export type Database = {
           linked_at?: string
         }
         Update: Partial<Omit<AssumptionEvidence, 'id'>>
+        Relationships: []
+      }
+      hypothesis_intro_links: {
+        Row: HypothesisIntroLink
+        Insert: Omit<HypothesisIntroLink, 'id' | 'created_at'> & {
+          created_at?: string
+        }
+        Update: never
+        Relationships: []
+      }
+      proof_events: {
+        Row: ProofEvent
+        Insert: Omit<ProofEvent, 'id' | 'occurred_at'> & {
+          occurred_at?: string
+        }
+        Update: never
         Relationships: []
       }
     }
