@@ -10,7 +10,7 @@ At the end of this phase, a user should be able to sign up, sign in, sign out, a
 
 ## Prerequisites
 
-- Phase 1 architecture and database design have been reviewed.
+- Phase 1 architecture and database design have been reviewed
 - Phase 2 UI foundation and navigation work locally.
 - The repository is available to Claude.
 - A Supabase project is available, or you are ready to create one.
