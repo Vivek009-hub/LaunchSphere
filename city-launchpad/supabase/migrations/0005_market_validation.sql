@@ -87,11 +87,14 @@ ALTER TABLE experiments ADD COLUMN IF NOT EXISTS threshold_min_sample integer;
 ALTER TABLE experiments ADD COLUMN IF NOT EXISTS threshold_rationale text;
 ALTER TABLE experiments ADD COLUMN IF NOT EXISTS outcome_interpretation text;
 ALTER TABLE experiments ADD COLUMN IF NOT EXISTS is_demo boolean NOT NULL DEFAULT false;
+ALTER TABLE experiments ADD COLUMN IF NOT EXISTS notes text;
 
 CREATE INDEX IF NOT EXISTS idx_experiments_hypothesis ON experiments(hypothesis_id);
 
 -- ─── 4. EXPERIMENT RESPONSES ENHANCEMENTS ────────────────────
+ALTER TABLE experiment_responses ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE;
 ALTER TABLE experiment_responses ADD COLUMN IF NOT EXISTS signal_tier text;
 ALTER TABLE experiment_responses ADD COLUMN IF NOT EXISTS units_count integer;
 ALTER TABLE experiment_responses ADD COLUMN IF NOT EXISTS financial_value numeric;
 ALTER TABLE experiment_responses ADD COLUMN IF NOT EXISTS rejection_reason text;
+

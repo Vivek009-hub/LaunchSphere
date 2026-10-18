@@ -14,6 +14,8 @@ import {
   Tag,
   MapPin,
   DollarSign,
+  Database,
+  ExternalLink,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -352,6 +354,11 @@ function OnboardingContent() {
     }
   }
 
+  const handleSkip = () => {
+    document.cookie = 'demo_mode=true; path=/; max-age=86400'
+    router.push(returnTo)
+  }
+
   if (initialLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
@@ -378,11 +385,14 @@ function OnboardingContent() {
             </div>
           </div>
 
-          <Link href={returnTo}>
-            <Button variant="ghost" size="sm" className="text-xs text-slate-400 hover:text-white">
-              {isEdit ? 'Back to Dashboard' : 'Skip for now'}
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSkip}
+            className="text-xs text-slate-400 hover:text-white"
+          >
+            {isEdit ? 'Back to Dashboard' : 'Skip for now'}
+          </Button>
         </div>
       </header>
 
@@ -411,10 +421,48 @@ function OnboardingContent() {
           </div>
 
           {serverError && (
-            <div className="mb-6 flex items-center gap-2 rounded-lg border border-rose-800/50 bg-rose-950/40 p-4 text-xs text-rose-300">
-              <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
-              <span>{serverError}</span>
-            </div>
+            serverError.toLowerCase().includes('startup_profiles') ||
+            serverError.toLowerCase().includes('schema cache') ? (
+              <div className="mb-6 rounded-lg border border-amber-800/60 bg-amber-950/40 p-4 text-xs text-amber-200 shadow-lg">
+                <div className="flex items-start gap-3">
+                  <Database className="h-5 w-5 shrink-0 text-amber-400 mt-0.5" />
+                  <div className="space-y-2 flex-1">
+                    <p className="font-semibold text-amber-300 text-sm">
+                      Database Schema Setup Required in Supabase
+                    </p>
+                    <p className="text-slate-300 leading-relaxed">
+                      The table <code className="px-1.5 py-0.5 rounded bg-slate-900 font-mono text-amber-300 text-[11px]">public.startup_profiles</code> has not been created in your Supabase project yet.
+                    </p>
+                    <p className="text-slate-400 leading-relaxed">
+                      To create all tables in 30 seconds, copy and execute <code className="px-1.5 py-0.5 rounded bg-slate-900 font-mono text-blue-300 text-[11px]">supabase/combined_migrations.sql</code> in your Supabase SQL Editor.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3 pt-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleSkip}
+                        className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold text-xs"
+                      >
+                        Explore in Demo Mode Now
+                      </Button>
+                      <a
+                        href="https://supabase.com/dashboard/project/tgnmtohepifungxgenwl/sql/new"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 underline underline-offset-4"
+                      >
+                        Open Supabase SQL Editor <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6 flex items-center gap-2 rounded-lg border border-rose-800/50 bg-rose-950/40 p-4 text-xs text-rose-300">
+                <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+                <span>{serverError}</span>
+              </div>
+            )
           )}
 
           <form onSubmit={handleSubmit}>

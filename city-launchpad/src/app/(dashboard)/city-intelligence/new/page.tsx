@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { PageShell, PageHeader } from '@/components/layout/PageShell'
@@ -27,14 +27,13 @@ import {
   Loader2,
   AlertCircle,
   Building2,
-  Sliders,
   ShieldCheck,
   Info,
 } from 'lucide-react'
 
 export default function NewComparisonPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [availableCities, setAvailableCities] = useState<{ name: string; state: string; tier: string }[]>([])
   const [selectedCities, setSelectedCities] = useState<string[]>(['Bengaluru', 'Mumbai'])
@@ -97,7 +96,7 @@ export default function NewComparisonPage() {
     }
 
     loadInitialData()
-  }, [])
+  }, [supabase])
 
   const toggleCity = (cityName: string) => {
     let next: string[]

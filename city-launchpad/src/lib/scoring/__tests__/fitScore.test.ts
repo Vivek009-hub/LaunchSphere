@@ -3,9 +3,8 @@ import {
   evaluateCityCriteria,
   computeEvidenceCoverage,
   SCORING_MODEL_VERSION,
-  DEFAULT_CRITERIA,
 } from '../fitScore'
-import type { MarketIndicator, Competitor } from '@/types/database'
+import type { MarketIndicator } from '@/types/database'
 
 /**
  * Phase 5: Deterministic Fit Score Engine Unit Tests

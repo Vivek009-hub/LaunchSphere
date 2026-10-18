@@ -32,6 +32,10 @@ export default async function DashboardLayout({
       if (profile?.name) {
         profileName = profile.name
         isDemo = false
+      } else if (isDemoActive) {
+        // In demo mode, allow browsing even if profile has not been created in DB yet
+        profileName = DEMO_PROFILE.name
+        isDemo = true
       } else {
         // Authenticated user needs onboarding
         redirect('/onboarding')

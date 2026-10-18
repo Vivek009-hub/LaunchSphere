@@ -181,13 +181,13 @@ export function Sidebar({ onCloseMobile, isMobile = false, className }: SidebarP
         </Link>
       </nav>
 
-      {/* Footer Prototype Tag */}
+      {/* Footer Platform Tag */}
       <div className="border-t border-slate-800 p-4 bg-slate-950/60">
         <div className="flex items-center gap-2 rounded-lg bg-slate-900/80 border border-slate-800 px-3 py-2 text-xs">
-          <Sparkles className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+          <Sparkles className="h-3.5 w-3.5 text-indigo-400 flex-shrink-0" />
           <div className="flex flex-col">
-            <span className="font-semibold text-slate-300 text-[11px]">Phase 2 Foundation</span>
-            <span className="text-[10px] text-slate-500">B2B SaaS Prototype</span>
+            <span className="font-semibold text-slate-300 text-[11px]">City Launchpad</span>
+            <span className="text-[10px] text-slate-500">Market Proof Engine</span>
           </div>
         </div>
       </div>

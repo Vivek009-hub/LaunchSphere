@@ -404,35 +404,52 @@ export async function createExperiment(
       return { success: true, data: newExp }
     }
 
-    const { data: exp, error: insertError } = await supabase
+    const insertPayload: Record<string, unknown> = {
+      user_id: user.id,
+      startup_id: validated.startup_id || null,
+      hypothesis_id: validated.hypothesis_id || null,
+      comparison_id: validated.comparison_id || null,
+      title: validated.title,
+      hypothesis: validated.hypothesis,
+      method: validated.method,
+      city: validated.city,
+      target_audience: validated.target_audience || null,
+      sample_size_target: validated.sample_size_target,
+      start_date: validated.start_date || null,
+      end_date: validated.end_date || null,
+      target_metric: validated.target_metric,
+      success_threshold: validated.success_threshold,
+      threshold_metric: validated.threshold_metric,
+      threshold_operator: validated.threshold_operator,
+      threshold_target: validated.threshold_target,
+      threshold_unit: validated.threshold_unit,
+      threshold_min_sample: validated.threshold_min_sample,
+      threshold_rationale: validated.threshold_rationale || null,
+      status: validated.status || 'planned',
+      outcome_interpretation: 'not_evaluated',
+    }
+
+    if (validated.notes) {
+      insertPayload.notes = validated.notes
+    }
+
+    let { data: exp, error: insertError } = await supabase
       .from('experiments')
-      .insert({
-        user_id: user.id,
-        startup_id: validated.startup_id || null,
-        hypothesis_id: validated.hypothesis_id || null,
-        comparison_id: validated.comparison_id || null,
-        title: validated.title,
-        hypothesis: validated.hypothesis,
-        method: validated.method,
-        city: validated.city,
-        target_audience: validated.target_audience || null,
-        sample_size_target: validated.sample_size_target,
-        start_date: validated.start_date || null,
-        end_date: validated.end_date || null,
-        target_metric: validated.target_metric,
-        success_threshold: validated.success_threshold,
-        threshold_metric: validated.threshold_metric,
-        threshold_operator: validated.threshold_operator,
-        threshold_target: validated.threshold_target,
-        threshold_unit: validated.threshold_unit,
-        threshold_min_sample: validated.threshold_min_sample,
-        threshold_rationale: validated.threshold_rationale || null,
-        status: validated.status || 'planned',
-        outcome_interpretation: 'not_evaluated',
-        notes: validated.notes || null,
-      })
+      .insert(insertPayload as any)
       .select()
       .single()
+
+    // Resilient fallback: if the database hasn't had the notes column added yet, retry without notes
+    if (insertError && insertError.message.includes("'notes'") && insertPayload.notes) {
+      delete insertPayload.notes
+      const retry = await supabase
+        .from('experiments')
+        .insert(insertPayload as any)
+        .select()
+        .single()
+      exp = retry.data
+      insertError = retry.error
+    }
 
     if (insertError) {
       return { success: false, error: insertError.message }
@@ -637,23 +654,37 @@ export async function recordExperimentResponse(
       return { success: true, data: newResponse }
     }
 
-    const { data: resp, error: insertError } = await supabase
+    const responsePayload: Record<string, unknown> = {
+      experiment_id: validated.experiment_id,
+      user_id: user.id,
+      respondent_label: validated.respondent_label,
+      response_type: validated.response_type,
+      outcome: validated.outcome,
+      signal_tier: validated.signal_tier,
+      units_count: validated.units_count,
+      financial_value: validated.financial_value ?? null,
+      notes: validated.notes || null,
+      rejection_reason: validated.rejection_reason || null,
+      evidence_url: validated.evidence_url || null,
+    }
+
+    let { data: resp, error: insertError } = await supabase
       .from('experiment_responses')
-      .insert({
-        experiment_id: validated.experiment_id,
-        user_id: user.id,
-        respondent_label: validated.respondent_label,
-        response_type: validated.response_type,
-        outcome: validated.outcome,
-        signal_tier: validated.signal_tier,
-        units_count: validated.units_count,
-        financial_value: validated.financial_value ?? null,
-        notes: validated.notes || null,
-        rejection_reason: validated.rejection_reason || null,
-        evidence_url: validated.evidence_url || null,
-      })
+      .insert(responsePayload as any)
       .select()
       .single()
+
+    // Resilient fallback: if user_id column hasn't been added to experiment_responses yet, retry without user_id
+    if (insertError && insertError.message.includes("'user_id'")) {
+      delete responsePayload.user_id
+      const retry = await supabase
+        .from('experiment_responses')
+        .insert(responsePayload as any)
+        .select()
+        .single()
+      resp = retry.data
+      insertError = retry.error
+    }
 
     if (insertError) {
       return { success: false, error: insertError.message }
