@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { PageShell } from '@/components/layout/PageShell'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { DataProvenance } from '@/components/shared/DataProvenance'
@@ -19,8 +19,9 @@ import {
   Layers,
   HelpCircle,
 } from 'lucide-react'
-import type { FitScore, FitScoreCriterion, MarketIndicator, Competitor, StartupProfile } from '@/types/database'
+import type { FitScore, FitScoreCriterion, Competitor, StartupProfile } from '@/types/database'
 import { fitScoreColor, fitScoreLabel, SCORING_MODEL_VERSION } from '@/lib/scoring/fitScore'
+import { AICompetitorExtractorModal } from '@/components/ai/AICompetitorExtractorModal'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -443,8 +444,13 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
         </div>
 
         {competitors.length === 0 ? (
-          <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-6 text-center text-xs text-slate-400">
-            No competitor records registered yet for {cities.join(' or ')}. Competitor mapping will expand as local research progresses.
+          <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-6 text-center space-y-3">
+            <p className="text-xs text-slate-400">
+              No competitor records registered yet for {cities.join(' or ')}. Competitor mapping will expand as local research progresses.
+            </p>
+            <div className="flex justify-center gap-2">
+              <AICompetitorExtractorModal city={cities[0] || 'Bengaluru'} />
+            </div>
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
@@ -458,9 +464,12 @@ export default async function ComparisonDetailPage({ params }: PageProps) {
                         <MapPin className="h-3.5 w-3.5 text-blue-400" />
                         {city} Competitors
                       </CardTitle>
-                      <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">
-                        {cityComps.length} tracked
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">
+                          {cityComps.length} tracked
+                        </Badge>
+                        <AICompetitorExtractorModal city={city} />
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 space-y-3">

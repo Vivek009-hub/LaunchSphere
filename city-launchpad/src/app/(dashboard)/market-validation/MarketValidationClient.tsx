@@ -38,6 +38,7 @@ import {
 } from 'lucide-react'
 import { createHypothesis, updateHypothesisStatus } from '@/lib/actions/marketValidation'
 import { formatDate } from '@/lib/utils'
+import { AIHypothesisDrafterModal } from '@/components/ai/AIHypothesisDrafterModal'
 
 interface MarketValidationClientProps {
   initialExperiments: Experiment[]
@@ -250,6 +251,9 @@ export function MarketValidationClient({
         description="Falsifiable market hypotheses and structured field experiments with deterministic success thresholds to prove commercial demand before expanding."
         actions={
           <div className="flex flex-wrap items-center gap-2.5">
+            <AIHypothesisDrafterModal
+              city={cityFilter !== 'All' ? cityFilter : 'Pune'}
+            />
             <Button
               variant="outline"
               size="sm"

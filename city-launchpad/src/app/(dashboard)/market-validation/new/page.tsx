@@ -29,6 +29,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { createExperiment, getHypotheses } from '@/lib/actions/marketValidation'
+import { AIHypothesisDrafterModal } from '@/components/ai/AIHypothesisDrafterModal'
 
 const methodOptions: { value: ExperimentMethod; label: string; desc: string; icon: string }[] = [
   {
@@ -275,9 +276,38 @@ function NewExperimentContent() {
         {/* ─── SECTION 1: HYPOTHESIS LINKAGE ─── */}
         <Card className="border-slate-800 bg-slate-900/60">
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-emerald-400" />
-              <CardTitle className="text-base text-white">1. Link Market Hypothesis</CardTitle>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-emerald-400" />
+                <CardTitle className="text-base text-white">1. Link Market Hypothesis</CardTitle>
+              </div>
+              <AIHypothesisDrafterModal
+                city={form.city}
+                onSelectHypothesis={(draft) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    target_audience: draft.target_audience || prev.target_audience,
+                    hypothesis: draft.statement,
+                    title: prev.title || `${prev.city}: Testing ${draft.target_audience.slice(0, 30)}`,
+                  }))
+                }}
+                onSelectExperiment={(draft) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    title: draft.title,
+                    method: draft.method,
+                    hypothesis: draft.hypothesis_statement || prev.hypothesis,
+                    sample_size_target: draft.sample_size_target,
+                    threshold_metric: draft.threshold_metric,
+                    target_metric: draft.target_metric,
+                    threshold_operator: draft.threshold_operator,
+                    threshold_target: draft.threshold_target,
+                    threshold_unit: draft.threshold_unit,
+                    threshold_min_sample: draft.threshold_min_sample,
+                    threshold_rationale: draft.threshold_rationale,
+                  }))
+                }}
+              />
             </div>
             <CardDescription className="text-xs text-slate-400">
               Anchor this experiment to a falsifiable hypothesis so findings inform your expansion strategy.

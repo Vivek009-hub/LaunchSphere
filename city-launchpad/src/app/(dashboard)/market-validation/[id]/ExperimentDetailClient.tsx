@@ -31,6 +31,7 @@ import {
   updateExperimentThreshold,
 } from '@/lib/actions/marketValidation'
 import { formatDate } from '@/lib/utils'
+import { AIExperimentFindingsModal } from '@/components/ai/AIExperimentFindingsModal'
 import {
   FlaskConical,
   ArrowLeft,
@@ -376,6 +377,10 @@ export function ExperimentDetailClient({
 
           {/* Action Buttons */}
           <div className="flex flex-wrap items-center gap-2">
+            <AIExperimentFindingsModal
+              experimentId={experiment.id}
+              experimentTitle={experiment.title}
+            />
             {experiment.status === 'planned' && (
               <Button
                 size="sm"

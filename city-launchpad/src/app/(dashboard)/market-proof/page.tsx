@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { DemoBanner } from '@/components/shared/DemoBanner'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { AIEvidenceSummaryCard } from '@/components/ai/AIEvidenceSummaryCard'
 import { getMarketProofData } from '@/lib/actions/marketProof'
 import type { HypothesisProofView } from '@/lib/actions/marketProof'
 import type { HypothesisStatus, ProofEvent } from '@/types/database'
@@ -566,6 +567,9 @@ export default async function MarketProofPage() {
               </div>
             )}
           </section>
+
+          {/* AI-Assisted Market Evidence Synthesis */}
+          <AIEvidenceSummaryCard />
 
           {/* Two-column layout: cards + sidebar */}
           <div className="grid gap-8 lg:grid-cols-3">

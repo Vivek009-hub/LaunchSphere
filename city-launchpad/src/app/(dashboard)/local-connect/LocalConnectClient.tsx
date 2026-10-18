@@ -37,6 +37,7 @@ import type { Contact, ContactCategory, IntroductionRequest, StartupProfile } fr
 import { rankContacts } from '@/lib/scoring/localConnectMatching'
 import { cancelIntroductionRequest } from '@/lib/actions/introductionRequests'
 import { formatDate } from '@/lib/utils'
+import { AILocalConnectModal } from '@/components/ai/AILocalConnectModal'
 
 interface LocalConnectClientProps {
   initialContacts: Contact[]
@@ -396,17 +397,27 @@ export function LocalConnectClient({
                   Showing <strong className="text-white">{filteredContacts.length}</strong> matching local resources
                 </span>
 
-                {hasActiveFilters && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClearFilters}
-                    className="text-xs text-slate-400 hover:text-white h-7 px-2"
-                    id="clear-filters-btn"
-                  >
-                    <X className="h-3 w-3 mr-1" /> Clear all filters
-                  </Button>
-                )}
+                <div className="flex items-center gap-2">
+                  <AILocalConnectModal
+                    currentCity={selectedCity !== 'all' ? selectedCity : startupProfile?.current_city || 'Pune'}
+                    onApplyFilters={(f) => {
+                      if (f.category) setSelectedCategory(f.category)
+                      if (f.city) setSelectedCity(f.city)
+                      if (f.query) setSearchQuery(f.query)
+                    }}
+                  />
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearFilters}
+                      className="text-xs text-slate-400 hover:text-white h-7 px-2"
+                      id="clear-filters-btn"
+                    >
+                      <X className="h-3 w-3 mr-1" /> Clear all filters
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
