@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 
 const inter = Inter({
@@ -26,10 +27,50 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased bg-slate-950 text-slate-200`}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <Script
+          id="suppress-extension-noise"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function isExt(s) {
+                  return s && (
+                    s.indexOf('chrome-extension://') !== -1 ||
+                    s.indexOf('moz-extension://') !== -1 ||
+                    s.indexOf('safari-web-extension://') !== -1 ||
+                    s.indexOf('MetaMask') !== -1 ||
+                    s.indexOf('inpage.js') !== -1
+                  );
+                }
+                window.addEventListener('unhandledrejection', function(e) {
+                  var r = e.reason;
+                  var str = typeof r === 'string' ? r : (r && (r.stack || r.message)) || '';
+                  if (isExt(str)) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                  }
+                }, true);
+                window.addEventListener('error', function(e) {
+                  var str = (e.filename || '') + ' ' + (e.message || '') + ' ' + (e.error && e.error.stack || '');
+                  if (isExt(str)) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                  }
+                }, true);
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body
+        suppressHydrationWarning
+        className={`${inter.variable} font-sans antialiased bg-slate-950 text-slate-200`}
+      >
         {children}
       </body>
     </html>
   )
 }
+
