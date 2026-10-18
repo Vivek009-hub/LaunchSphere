@@ -131,7 +131,7 @@ class GeminiProvider implements AIProvider {
   private modelName: string
 
   constructor(modelName?: string) {
-    this.modelName = modelName || process.env.GEMINI_MODEL || 'gemini-1.5-flash'
+    this.modelName = modelName || process.env.GEMINI_MODEL || 'gemini-3.8-flash'
   }
 
   isConfigured(): boolean {
@@ -234,6 +234,7 @@ class GeminiProvider implements AIProvider {
         }
       }
 
+      console.error('[GeminiProvider generateStructured error]:', err)
       return {
         success: false,
         error: 'AI_PROVIDER_ERROR',

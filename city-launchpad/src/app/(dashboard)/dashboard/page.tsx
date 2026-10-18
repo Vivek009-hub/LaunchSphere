@@ -46,6 +46,7 @@ export default function DashboardPage() {
               alt="Golden Metropolis Skyline"
               fill
               priority
+              loading="eager"
               sizes="(max-width: 1024px) 100vw, 66vw"
               className="object-cover object-center opacity-35 select-none sepia-[0.35] brightness-90 contrast-125"
             />
