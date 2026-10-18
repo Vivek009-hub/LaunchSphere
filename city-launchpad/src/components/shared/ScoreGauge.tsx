@@ -30,23 +30,23 @@ export function ScoreGauge({
   const arcLength = circumference * 0.75
   const strokeDashoffset = arcLength - (arcLength * clampedScore) / 100
 
-  // Colors & qualitative rating
-  let strokeColor = '#10b981' // emerald
-  let ratingText = 'Strong Match'
-  let textColor = 'text-emerald-400'
+  // Midnight Gold Colors & rating
+  let strokeColor = '#F5B94C' // gold
+  let ratingText = 'High Opportunity'
+  let textColor = 'text-[#F5B94C]'
 
   if (clampedScore < 50) {
-    strokeColor = '#f43f5e' // rose
+    strokeColor = '#F87171' // danger rose
     ratingText = 'Challenging'
     textColor = 'text-rose-400'
   } else if (clampedScore < 70) {
-    strokeColor = '#f59e0b' // amber
+    strokeColor = '#9A6B22' // deep gold
     ratingText = 'Moderate'
-    textColor = 'text-amber-400'
-  } else if (clampedScore < 80) {
-    strokeColor = '#6366f1' // indigo
-    ratingText = 'Promising'
-    textColor = 'text-indigo-400'
+    textColor = 'text-[#FFD27A]'
+  } else if (clampedScore >= 80) {
+    strokeColor = '#FFD27A' // bright gold
+    ratingText = 'Top Fit'
+    textColor = 'text-[#FFD27A]'
   }
 
   const ariaDescription = accessibleLabel ?? `${label}: ${clampedScore} out of 100 (${ratingText})`
@@ -71,7 +71,7 @@ export function ScoreGauge({
             cy={dimension / 2}
             r={radius}
             fill="none"
-            stroke="oklch(0.25 0.02 264)"
+            stroke="#252729"
             strokeWidth={strokeWidth}
             strokeDasharray={`${arcLength} ${circumference}`}
             strokeLinecap="round"
@@ -95,25 +95,32 @@ export function ScoreGauge({
         <div className="absolute flex flex-col items-center justify-center text-center">
           <span
             className={cn(
-              'font-extrabold tracking-tight text-white',
+              'font-extrabold tracking-tight text-[#F5F5F2] font-mono',
               size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-2xl' : 'text-lg'
             )}
           >
             {clampedScore}
           </span>
           {size !== 'sm' && (
-            <span className="text-[9px] font-medium uppercase tracking-wider text-slate-500">
-              /100
-            </span>
+            <span className="text-[10px] text-[#858783] leading-none mt-0.5">/100</span>
           )}
         </div>
       </div>
 
+      {label && size !== 'sm' && (
+        <span className="mt-1 text-xs font-medium text-[#858783]">{label}</span>
+      )}
+
       {showRating && (
-        <div className="mt-1 flex flex-col items-center">
-          <span className={cn('text-[11px] font-semibold', textColor)}>{ratingText}</span>
-          {label && <span className="text-[10px] text-slate-500">{label}</span>}
-        </div>
+        <span
+          className={cn(
+            'mt-0.5 font-semibold text-center leading-tight',
+            textColor,
+            size === 'sm' ? 'text-[10px]' : 'text-xs'
+          )}
+        >
+          {ratingText}
+        </span>
       )}
     </div>
   )

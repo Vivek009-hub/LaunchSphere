@@ -61,19 +61,19 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-md">
-      <div className="gradient-border rounded-2xl bg-slate-900/90 p-8 shadow-2xl backdrop-blur-xl">
+      <div className="rounded-2xl border border-[#252729] bg-[#101314]/95 p-8 shadow-2xl backdrop-blur-xl">
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 shadow-lg shadow-indigo-600/30">
-            <Rocket className="h-6 w-6 text-white" />
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#252729] bg-[#151719] text-[#F5B94C] shadow-lg shadow-[#F5B94C]/20">
+            <Rocket className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Welcome back</h1>
-          <p className="mt-1 text-sm text-slate-400">Sign in to City Launchpad</p>
+          <h1 className="text-2xl font-bold tracking-tight text-[#F5F5F2]">Welcome back</h1>
+          <p className="mt-1 text-sm text-[#858783]">Sign in to City Launchpad</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4" id="form-login">
           <div className="space-y-1.5">
-            <Label htmlFor="login-email">Email address</Label>
+            <Label htmlFor="login-email" className="text-xs text-[#B4B5B2]">Email address</Label>
             <Input
               id="login-email"
               type="email"
@@ -82,11 +82,12 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] placeholder-[#858783] focus:border-[#F5B94C]"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="login-password">Password</Label>
+            <Label htmlFor="login-password" className="text-xs text-[#B4B5B2]">Password</Label>
             <div className="relative">
               <Input
                 id="login-password"
@@ -96,16 +97,16 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="pr-10"
+                className="pr-10 bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] placeholder-[#858783] focus:border-[#F5B94C]"
               />
               <button
                 type="button"
                 id="btn-toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#858783] hover:text-[#F5F5F2] transition-colors"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4 text-[#858783]" />}
               </button>
             </div>
           </div>
@@ -113,9 +114,9 @@ function LoginForm() {
           {error && (
             <div
               role="alert"
-              className="flex items-start gap-2 rounded-lg border border-rose-800/50 bg-rose-900/20 px-4 py-3 text-sm text-rose-400"
+              className="flex items-start gap-2 rounded-lg border border-[#4E1821] bg-[#280D11]/40 px-4 py-3 text-sm text-[#FB7185]"
             >
-              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0 text-[#FB7185]" />
               <span>{error}</span>
             </div>
           )}
@@ -123,13 +124,13 @@ function LoginForm() {
           <Button
             id="btn-login"
             type="submit"
-            className="w-full"
+            className="w-full bg-gradient-to-r from-[#FFD27A] via-[#F5B94C] to-[#E5A83B] text-[#080A0B] font-bold shadow-lg shadow-[#F5B94C]/25 text-sm hover:brightness-105"
             size="lg"
             disabled={loading}
           >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#080A0B]" />
                 Signing in…
               </>
             ) : (
@@ -138,25 +139,25 @@ function LoginForm() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-500">
+        <p className="mt-6 text-center text-sm text-[#858783]">
           Don&apos;t have an account?{' '}
           <Link
             href="/register"
             id="link-register"
-            className="font-medium text-indigo-400 hover:text-indigo-300"
+            className="font-medium text-[#F5B94C] hover:text-[#FFD27A] transition-colors"
           >
             Create one →
           </Link>
         </p>
 
-        <div className="mt-6 border-t border-slate-800 pt-5 text-center">
+        <div className="mt-6 border-t border-[#252729] pt-5 text-center">
           <button
             type="button"
             onClick={handleEnterDemo}
             id="link-explore-demo"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#252729] bg-[#151719] px-4 py-2 text-xs font-semibold text-[#F5B94C] hover:bg-[#1A1D20] transition-colors"
           >
-            <span>Explore Demo Prototype (Phase 2)</span>
+            <span>Explore Demo Prototype</span>
             <span>→</span>
           </button>
         </div>

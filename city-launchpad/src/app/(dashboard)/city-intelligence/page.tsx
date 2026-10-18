@@ -98,21 +98,21 @@ export default async function CityIntelligencePage() {
             const StatusIcon = status.icon
             return (
               <Link key={c.id} href={`/city-intelligence/${c.id}`} id={`comparison-${c.id}`}>
-                <Card className="h-full cursor-pointer transition-all hover:border-slate-700 hover:-translate-y-0.5">
+                <Card className="h-full cursor-pointer transition-all border-[#252729] bg-[#101314] hover:border-[#3A3D40] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/60">
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-sm leading-snug">{c.title}</CardTitle>
-                      <Badge variant={status.variant} className="flex-shrink-0 gap-1 text-[10px]">
+                      <CardTitle className="text-sm font-semibold leading-snug text-[#F5F5F2]">{c.title}</CardTitle>
+                      <Badge variant={status.variant} className="flex-shrink-0 gap-1 text-[10px] font-mono">
                         <StatusIcon className="h-2.5 w-2.5" />
                         {status.label}
                       </Badge>
                     </div>
-                    <CardDescription>
+                    <CardDescription className="text-xs text-[#858783] mt-1 font-medium">
                       {c.cities.join(' vs ')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    <div className="flex items-center justify-between text-xs text-slate-500">
+                    <div className="flex items-center justify-between text-xs text-[#858783] font-mono">
                       <span>
                         {new Date(c.created_at).toLocaleDateString('en-IN', {
                           day: 'numeric',
@@ -121,7 +121,7 @@ export default async function CityIntelligencePage() {
                         })}
                       </span>
                       {c.scoring_model_version && (
-                        <Badge variant="outline" className="border-slate-800 text-slate-400 text-[10px] font-mono">
+                        <Badge variant="outline" className="border-[#252729] text-[#F5B94C] text-[10px] font-mono bg-[#151719]">
                           {c.scoring_model_version}
                         </Badge>
                       )}

@@ -29,8 +29,8 @@ export function StatCard({
   value,
   subtitle,
   icon: Icon,
-  iconColor = 'text-indigo-400',
-  iconBg = 'bg-indigo-500/10',
+  iconColor = 'text-[#F5B94C]',
+  iconBg = 'bg-[#151719] border border-[#252729]',
   trend,
   badge,
   isDemo = false,
@@ -41,7 +41,7 @@ export function StatCard({
     <Card
       id={id}
       className={cn(
-        'relative overflow-hidden transition-all duration-200 hover:border-slate-700 hover:shadow-lg',
+        'relative overflow-hidden transition-all duration-200 border-[#252729] bg-[#101314] hover:border-[#3A3D40] hover:shadow-lg hover:shadow-black/60',
         onClick && 'cursor-pointer hover:-translate-y-0.5',
         className
       )}
@@ -50,18 +50,18 @@ export function StatCard({
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div className="flex flex-col">
-            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#858783]">
               {title}
             </span>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold tracking-tight text-white">{value}</span>
+              <span className="text-2xl font-bold tracking-tight text-[#F5F5F2] font-mono">{value}</span>
               {trend && (
                 <span
                   className={cn(
-                    'inline-flex items-center text-xs font-medium',
-                    trend.direction === 'up' && 'text-emerald-400',
+                    'inline-flex items-center text-xs font-medium font-mono',
+                    trend.direction === 'up' && 'text-[#F5B94C]',
                     trend.direction === 'down' && 'text-rose-400',
-                    trend.direction === 'neutral' && 'text-slate-400'
+                    trend.direction === 'neutral' && 'text-[#858783]'
                   )}
                 >
                   {trend.direction === 'up' && <ArrowUpRight className="mr-0.5 h-3 w-3" />}
@@ -71,11 +71,11 @@ export function StatCard({
                 </span>
               )}
             </div>
-            {subtitle && <p className="mt-1 text-xs text-slate-500">{subtitle}</p>}
+            {subtitle && <p className="mt-1 text-xs text-[#858783]">{subtitle}</p>}
           </div>
 
           <div className="flex flex-col items-end gap-1.5">
-            <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl', iconBg)}>
+            <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl shadow-inner', iconBg)}>
               <Icon className={cn('h-5 w-5', iconColor)} />
             </div>
             {badge && (

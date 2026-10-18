@@ -267,7 +267,7 @@ export default function ContactDetailPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/local-connect"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs text-[#858783] hover:text-[#F5B94C] transition-colors"
           id="back-to-directory"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Local Connect Directory
@@ -288,7 +288,7 @@ export default function ContactDetailPage() {
           </div>
           <button
             onClick={() => setSuccessNotice(null)}
-            className="text-slate-400 hover:text-white text-xs ml-2"
+            className="text-[#858783] hover:text-[#F5F5F2] text-xs ml-2"
           >
             Dismiss
           </button>
@@ -302,7 +302,7 @@ export default function ContactDetailPage() {
             <AlertCircle className="h-4 w-4 text-rose-400 flex-shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError(null)} className="text-slate-400 hover:text-white text-xs ml-2">
+          <button onClick={() => setError(null)} className="text-[#858783] hover:text-[#F5F5F2] text-xs ml-2">
             Dismiss
           </button>
         </div>
@@ -311,24 +311,24 @@ export default function ContactDetailPage() {
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left Column: Resource Profile & Verification Provenance */}
         <div className="lg:col-span-1 space-y-6">
-          <Card className="border-slate-800 bg-slate-900/60 backdrop-blur">
+          <Card className="border-[#252729] bg-[#101314]/90 backdrop-blur">
             <CardHeader className="text-center pb-4">
               <div
                 className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border ${colorClass} mb-3`}
               >
                 <Icon className="h-8 w-8" />
               </div>
-              <CardTitle className="text-xl font-bold text-white">{contact.name}</CardTitle>
+              <CardTitle className="text-xl font-bold text-[#F5F5F2]">{contact.name}</CardTitle>
               {contact.role && (
-                <p className="text-xs text-slate-300 font-medium">{contact.role}</p>
+                <p className="text-xs text-[#858783] font-medium">{contact.role}</p>
               )}
               {contact.organization && (
-                <p className="text-xs text-slate-400">{contact.organization}</p>
+                <p className="text-xs text-[#858783]/70">{contact.organization}</p>
               )}
 
               {/* Status Badges */}
               <div className="flex flex-wrap items-center justify-center gap-1.5 pt-3">
-                <Badge variant="outline" className="text-xs border-slate-700">
+                <Badge variant="outline" className="text-xs border-[#252729] bg-[#151719] text-[#858783]">
                   <MapPin className="h-3 w-3 mr-1" /> {contact.city}
                 </Badge>
                 <Badge variant="secondary" className="capitalize text-xs">
@@ -352,38 +352,38 @@ export default function ContactDetailPage() {
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-4 pt-2 border-t border-slate-800/80 text-xs">
+            <CardContent className="space-y-4 pt-2 border-t border-[#252729] text-xs">
               {/* Description */}
               {contact.description && (
                 <div>
-                  <h4 className="font-semibold uppercase tracking-wider text-slate-400 mb-1 text-[10px]">
+                  <h4 className="font-semibold uppercase tracking-wider text-[#858783] mb-1 text-[10px]">
                     Background & Overview
                   </h4>
-                  <p className="text-slate-300 leading-relaxed">{contact.description}</p>
+                  <p className="text-[#858783] leading-relaxed">{contact.description}</p>
                 </div>
               )}
 
               {/* Geographic Service Area */}
               {contact.service_area && (
                 <div>
-                  <h4 className="font-semibold uppercase tracking-wider text-slate-400 mb-1 text-[10px]">
+                  <h4 className="font-semibold uppercase tracking-wider text-[#858783] mb-1 text-[10px]">
                     Service Area Coverage
                   </h4>
-                  <p className="text-slate-300">{contact.service_area}</p>
+                  <p className="text-[#F5F5F2]">{contact.service_area}</p>
                 </div>
               )}
 
               {/* Capabilities */}
               {contact.capabilities && contact.capabilities.length > 0 && (
                 <div>
-                  <h4 className="font-semibold uppercase tracking-wider text-slate-400 mb-1.5 text-[10px]">
+                  <h4 className="font-semibold uppercase tracking-wider text-[#858783] mb-1.5 text-[10px]">
                     Core Capabilities
                   </h4>
                   <div className="flex flex-wrap gap-1">
                     {contact.capabilities.map((cap) => (
                       <span
                         key={cap}
-                        className="rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300 font-mono border border-slate-700"
+                        className="rounded bg-[#151719] px-2 py-0.5 text-[10px] text-[#F5F5F2] font-mono border border-[#252729]"
                       >
                         {cap}
                       </span>
@@ -395,12 +395,12 @@ export default function ContactDetailPage() {
               {/* Industry Focus Tags */}
               {contact.industry_tags && contact.industry_tags.length > 0 && (
                 <div>
-                  <h4 className="font-semibold uppercase tracking-wider text-slate-400 mb-1.5 text-[10px]">
+                  <h4 className="font-semibold uppercase tracking-wider text-[#858783] mb-1.5 text-[10px]">
                     Industry Focus Tags
                   </h4>
                   <div className="flex flex-wrap gap-1">
                     {contact.industry_tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-[10px] border-slate-700 text-slate-300">
+                      <Badge key={tag} variant="outline" className="text-[10px] border-[#252729] bg-[#151719] text-[#858783]">
                         <Tag className="h-2.5 w-2.5 mr-1" /> {tag}
                       </Badge>
                     ))}
@@ -411,14 +411,14 @@ export default function ContactDetailPage() {
               {/* Public Website */}
               {contact.website_url && (
                 <div>
-                  <h4 className="font-semibold uppercase tracking-wider text-slate-400 mb-1 text-[10px]">
+                  <h4 className="font-semibold uppercase tracking-wider text-[#858783] mb-1 text-[10px]">
                     Public Website
                   </h4>
                   <a
                     href={contact.website_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 hover:underline"
+                    className="inline-flex items-center gap-1.5 text-[#F5B94C] hover:text-[#FFD27A] hover:underline"
                   >
                     <Globe className="h-3 w-3" />
                     <span className="truncate max-w-[200px]">{contact.website_url}</span>
@@ -428,26 +428,26 @@ export default function ContactDetailPage() {
               )}
 
               {/* Transparent Data Provenance */}
-              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3 space-y-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">
+              <div className="rounded-lg border border-[#252729] bg-[#151719] p-3 space-y-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#858783] block">
                   Data Provenance & Verification
                 </span>
-                <div className="space-y-1 text-[11px] text-slate-300">
+                <div className="space-y-1 text-[11px] text-[#858783]">
                   <p>
-                    <span className="text-slate-500">Source:</span> <strong>{contact.source_name}</strong>
+                    <span className="text-[#858783]/70">Source:</span> <strong className="text-[#F5F5F2]">{contact.source_name}</strong>
                   </p>
                   {contact.source_url && (
                     <a
                       href={contact.source_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-indigo-400 hover:underline text-[11px]"
+                      className="inline-flex items-center gap-1 text-[#F5B94C] hover:underline text-[11px]"
                     >
                       <ExternalLink className="h-3 w-3" /> Verify Source Record
                     </a>
                   )}
                   {contact.verified_at && (
-                    <p className="flex items-center gap-1 text-slate-400 pt-0.5">
+                    <p className="flex items-center gap-1 text-[#858783] pt-0.5">
                       <Calendar className="h-3 w-3" />
                       Verified on {formatDate(contact.verified_at)}
                     </p>
@@ -463,50 +463,50 @@ export default function ContactDetailPage() {
           </Card>
 
           {/* Match Score & Transparent Explanations */}
-          <Card className="border-indigo-950/80 bg-indigo-950/20 backdrop-blur">
+          <Card className="border-[#3A3D40] bg-[#101314] backdrop-blur shadow-lg shadow-[#F5B94C]/5">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm font-semibold text-white flex items-center gap-1.5">
-                  <Sparkles className="h-4 w-4 text-indigo-400" />
+                <CardTitle className="text-sm font-semibold text-[#F5F5F2] flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 text-[#F5B94C]" />
                   Relevance Breakdown
                 </CardTitle>
-                <div className="rounded-full bg-indigo-500/20 px-2.5 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/30">
+                <div className="rounded-full bg-[#151719] px-2.5 py-0.5 text-xs font-bold text-[#F5B94C] border border-[#3A3D40]">
                   {matchBreakdown.totalScore} / 100
                 </div>
               </div>
-              <CardDescription className="text-xs text-slate-400">
+              <CardDescription className="text-xs text-[#858783]">
                 Deterministic matching vs {startupProfile?.name || 'active profile'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 pt-0 text-xs">
-              <div className="space-y-1.5 border-b border-indigo-950/60 pb-3">
+              <div className="space-y-1.5 border-b border-[#252729] pb-3">
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-400">Industry Relevance</span>
-                  <span className="font-mono text-slate-200">{matchBreakdown.industryScore}/35</span>
+                  <span className="text-[#858783]">Industry Relevance</span>
+                  <span className="font-mono text-[#F5F5F2]">{matchBreakdown.industryScore}/35</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-400">Geographic & Expansion Fit</span>
-                  <span className="font-mono text-slate-200">{matchBreakdown.geoScore}/35</span>
+                  <span className="text-[#858783]">Geographic & Expansion Fit</span>
+                  <span className="font-mono text-[#F5F5F2]">{matchBreakdown.geoScore}/35</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-400">Category & Channel Fit</span>
-                  <span className="font-mono text-slate-200">{matchBreakdown.categoryScore}/15</span>
+                  <span className="text-[#858783]">Category & Channel Fit</span>
+                  <span className="font-mono text-[#F5F5F2]">{matchBreakdown.categoryScore}/15</span>
                 </div>
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-400">Verification Transparency</span>
-                  <span className="font-mono text-slate-200">{matchBreakdown.verificationScore}/15</span>
+                  <span className="text-[#858783]">Verification Transparency</span>
+                  <span className="font-mono text-[#F5F5F2]">{matchBreakdown.verificationScore}/15</span>
                 </div>
               </div>
 
               {matchBreakdown.reasons.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="text-[10px] uppercase font-semibold text-indigo-400 tracking-wider">
+                  <span className="text-[10px] uppercase font-semibold text-[#F5B94C] tracking-wider">
                     Ground-Truth Match Reasons:
                   </span>
-                  <ul className="space-y-1 text-[11px] text-slate-300">
+                  <ul className="space-y-1 text-[11px] text-[#858783]">
                     {matchBreakdown.reasons.map((reason, idx) => (
                       <li key={idx} className="flex items-start gap-1.5">
-                        <Check className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                        <Check className="h-3.5 w-3.5 text-[#F5B94C] flex-shrink-0 mt-0.5" />
                         <span>{reason}</span>
                       </li>
                     ))}
@@ -519,18 +519,18 @@ export default function ContactDetailPage() {
 
         {/* Right Column: Introduction Request Workflow */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-slate-800 bg-slate-900/60 backdrop-blur">
+          <Card className="border-[#252729] bg-[#101314]/90 backdrop-blur">
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#151719] text-[#F5B94C] border border-[#3A3D40]">
                     <Send className="h-4 w-4" />
                   </div>
                   <div>
-                    <CardTitle className="text-base text-white">
+                    <CardTitle className="text-base text-[#F5F5F2]">
                       Introduction Request & Partnership Proposal
                     </CardTitle>
-                    <CardDescription className="text-xs">
+                    <CardDescription className="text-xs text-[#858783]">
                       Submit your business context and desired next step directly to this ecosystem contact.
                     </CardDescription>
                   </div>
@@ -548,32 +548,32 @@ export default function ContactDetailPage() {
             <CardContent>
               {existingRequest ? (
                 /* Existing Request Display */
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5 space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+                <div className="rounded-xl border border-[#252729] bg-[#151719] p-5 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#252729] pb-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-[#F5F5F2]">
                       <Clock className="h-4 w-4 text-amber-400" />
-                      Status: <span className="capitalize text-white">{existingRequest.status}</span>
+                      Status: <span className="capitalize text-[#F5B94C]">{existingRequest.status}</span>
                     </div>
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-[#858783]">
                       Submitted on {formatDate(existingRequest.created_at)}
                     </span>
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2 text-xs">
                     <div>
-                      <span className="text-slate-400 font-semibold block mb-0.5">Purpose:</span>
-                      <p className="text-slate-200 font-medium">{existingRequest.purpose || 'Ecosystem partnership'}</p>
+                      <span className="text-[#858783] font-semibold block mb-0.5">Purpose:</span>
+                      <p className="text-[#F5F5F2] font-medium">{existingRequest.purpose || 'Ecosystem partnership'}</p>
                     </div>
                     <div>
-                      <span className="text-slate-400 font-semibold block mb-0.5">Desired Outcome:</span>
-                      <p className="text-slate-200 font-medium">{existingRequest.desired_outcome || 'Introductory review'}</p>
+                      <span className="text-[#858783] font-semibold block mb-0.5">Desired Outcome:</span>
+                      <p className="text-[#F5F5F2] font-medium">{existingRequest.desired_outcome || 'Introductory review'}</p>
                     </div>
                   </div>
 
                   {existingRequest.business_context && (
                     <div className="text-xs space-y-1">
-                      <span className="text-slate-400 font-semibold block">Business Context:</span>
-                      <p className="text-slate-300 leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                      <span className="text-[#858783] font-semibold block">Business Context:</span>
+                      <p className="text-[#858783] leading-relaxed bg-[#101314] p-3 rounded-lg border border-[#252729]">
                         {existingRequest.business_context}
                       </p>
                     </div>
@@ -581,16 +581,16 @@ export default function ContactDetailPage() {
 
                   {existingRequest.message && (
                     <div className="text-xs space-y-1">
-                      <span className="text-slate-400 font-semibold block">Pitch Message Body:</span>
-                      <pre className="text-slate-300 font-sans whitespace-pre-wrap bg-slate-900/80 p-3 rounded-lg border border-slate-800 text-xs">
+                      <span className="text-[#858783] font-semibold block">Pitch Message Body:</span>
+                      <pre className="text-[#F5F5F2] font-sans whitespace-pre-wrap bg-[#101314] p-3 rounded-lg border border-[#252729] text-xs">
                         {existingRequest.message}
                       </pre>
                     </div>
                   )}
 
                   {existingRequest.status === 'pending' && (
-                    <div className="pt-2 flex justify-between items-center border-t border-slate-800/80">
-                      <span className="text-xs text-slate-400">
+                    <div className="pt-2 flex justify-between items-center border-t border-[#252729]">
+                      <span className="text-xs text-[#858783]">
                         Pending response from local contact or regional ecosystem administrator.
                       </span>
                       <Button
@@ -618,13 +618,13 @@ export default function ContactDetailPage() {
                 <form onSubmit={handleSendIntro} className="space-y-4">
                   {/* Purpose Selector */}
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-slate-300 font-medium">
+                    <Label className="text-xs text-[#F5F5F2] font-medium">
                       Introduction Purpose *
                     </Label>
                     <select
                       value={purpose}
                       onChange={(e) => setPurpose(e.target.value)}
-                      className="w-full rounded-md border border-slate-700 bg-slate-950 p-2.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md border border-[#252729] bg-[#151719] p-2.5 text-xs text-[#F5F5F2] focus:outline-none focus:border-[#F5B94C] focus:ring-1 focus:ring-[#F5B94C]"
                       id="purpose-select"
                       required
                     >
@@ -641,10 +641,10 @@ export default function ContactDetailPage() {
                   {/* Business Context */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <Label className="text-xs text-slate-300 font-medium">
+                      <Label className="text-xs text-[#F5F5F2] font-medium">
                         Brief Business Context & Readiness *
                       </Label>
-                      <span className="text-[10px] text-slate-500">Min 10 characters</span>
+                      <span className="text-[10px] text-[#858783]">Min 10 characters</span>
                     </div>
                     <textarea
                       rows={3}
@@ -653,7 +653,7 @@ export default function ContactDetailPage() {
                       placeholder="Outline your startup's core product, active traction, and specific goals for this market."
                       required
                       minLength={10}
-                      className="w-full rounded-md border border-slate-700 bg-slate-950 p-3 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md border border-[#252729] bg-[#151719] p-3 text-xs text-[#F5F5F2] placeholder-[#858783]/60 focus:outline-none focus:border-[#F5B94C] focus:ring-1 focus:ring-[#F5B94C]"
                       id="business-context-input"
                     />
                   </div>
@@ -661,10 +661,10 @@ export default function ContactDetailPage() {
                   {/* Desired Outcome */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center">
-                      <Label className="text-xs text-slate-300 font-medium">
+                      <Label className="text-xs text-[#F5F5F2] font-medium">
                         Desired Outcome / Next Step *
                       </Label>
-                      <span className="text-[10px] text-slate-500">Min 5 characters</span>
+                      <span className="text-[10px] text-[#858783]">Min 5 characters</span>
                     </div>
                     <Input
                       value={desiredOutcome}
@@ -672,7 +672,7 @@ export default function ContactDetailPage() {
                       placeholder="e.g. Schedule a 30-min call or explore a 30-day paid pilot"
                       required
                       minLength={5}
-                      className="bg-slate-950 border-slate-700 text-xs"
+                      className="bg-[#151719] border-[#252729] text-xs text-[#F5F5F2] placeholder-[#858783]/60 focus:border-[#F5B94C]"
                       id="desired-outcome-input"
                     />
                   </div>
@@ -680,18 +680,18 @@ export default function ContactDetailPage() {
                   {/* Pitch Message Body */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs text-slate-300 font-medium">
+                      <Label className="text-xs text-[#F5F5F2] font-medium">
                         Direct Message to Recipient (Optional)
                       </Label>
-                      <span className="text-[10px] text-indigo-400 flex items-center gap-1">
-                        <Sparkles className="h-3 w-3" /> Pre-filled pitch template
+                      <span className="text-[10px] text-[#F5B94C] flex items-center gap-1 font-mono">
+                        <Sparkles className="h-3 w-3 text-[#F5B94C]" /> Pre-filled pitch template
                       </span>
                     </div>
                     <textarea
                       rows={5}
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="w-full rounded-md border border-slate-700 bg-slate-950 p-3 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-md border border-[#252729] bg-[#151719] p-3 text-xs text-[#F5F5F2] placeholder-[#858783]/60 focus:outline-none focus:border-[#F5B94C] focus:ring-1 focus:ring-[#F5B94C]"
                       id="message-input"
                     />
                   </div>
@@ -700,7 +700,7 @@ export default function ContactDetailPage() {
                     <Button
                       type="submit"
                       disabled={submitting}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white gap-2 text-xs"
+                      className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold gap-2 text-xs shadow-lg shadow-[#F5B94C]/20"
                       id="submit-intro-btn"
                     >
                       {submitting ? (

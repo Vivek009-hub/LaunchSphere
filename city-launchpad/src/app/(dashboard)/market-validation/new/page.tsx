@@ -253,7 +253,7 @@ function NewExperimentContent() {
       <div className="mb-4">
         <Link
           href="/market-validation"
-          className="inline-flex items-center text-xs text-slate-400 hover:text-slate-200 transition-colors"
+          className="inline-flex items-center text-xs text-[#858783] hover:text-[#F5B94C] transition-colors"
         >
           <ArrowLeft className="mr-1.5 h-3.5 w-3.5" />
           Back to Market Validation
@@ -274,12 +274,12 @@ function NewExperimentContent() {
         )}
 
         {/* ─── SECTION 1: HYPOTHESIS LINKAGE ─── */}
-        <Card className="border-slate-800 bg-slate-900/60">
+        <Card className="border-[#252729] bg-[#101314]/90">
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-emerald-400" />
-                <CardTitle className="text-base text-white">1. Link Market Hypothesis</CardTitle>
+                <Sparkles className="h-4 w-4 text-[#F5B94C]" />
+                <CardTitle className="text-base text-[#F5F5F2]">1. Link Market Hypothesis</CardTitle>
               </div>
               <AIHypothesisDrafterModal
                 city={form.city}
@@ -309,17 +309,17 @@ function NewExperimentContent() {
                 }}
               />
             </div>
-            <CardDescription className="text-xs text-slate-400">
+            <CardDescription className="text-xs text-[#858783]">
               Anchor this experiment to a falsifiable hypothesis so findings inform your expansion strategy.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300 font-medium">Select Existing Hypothesis</Label>
+              <Label className="text-xs text-[#F5F5F2] font-medium">Select Existing Hypothesis</Label>
               <Select
                 value={selectedHypothesisId}
                 onChange={(e) => handleHypothesisSelect(e.target.value)}
-                className="bg-slate-950 border-slate-700 text-sm"
+                className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
               >
                 <option value="">-- Enter Custom Hypothesis or Select --</option>
                 {hypotheses.map((h) => (
@@ -331,7 +331,7 @@ function NewExperimentContent() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="exp-hypothesis" className="text-xs text-slate-300 font-medium">
+              <Label htmlFor="exp-hypothesis" className="text-xs text-[#F5F5F2] font-medium">
                 Hypothesis Description *
               </Label>
               <Textarea
@@ -340,7 +340,7 @@ function NewExperimentContent() {
                 placeholder="State the underlying customer behavior or willingness-to-pay assumption you are testing..."
                 value={form.hypothesis}
                 onChange={(e) => setForm({ ...form, hypothesis: e.target.value })}
-                className="bg-slate-950 border-slate-700 text-sm"
+                className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                 required
               />
             </div>
@@ -348,19 +348,19 @@ function NewExperimentContent() {
         </Card>
 
         {/* ─── SECTION 2: EXPERIMENT METHOD & AUDIENCE ─── */}
-        <Card className="border-slate-800 bg-slate-900/60">
+        <Card className="border-[#252729] bg-[#101314]/90">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <FlaskConical className="h-4 w-4 text-emerald-400" />
-              <CardTitle className="text-base text-white">2. Testing Method & Location</CardTitle>
+              <FlaskConical className="h-4 w-4 text-[#F5B94C]" />
+              <CardTitle className="text-base text-[#F5F5F2]">2. Testing Method & Location</CardTitle>
             </div>
-            <CardDescription className="text-xs text-slate-400">
+            <CardDescription className="text-xs text-[#858783]">
               Select the appropriate validation instrument and target audience segment.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-2">
-              <Label className="text-xs text-slate-300 font-medium">Method *</Label>
+              <Label className="text-xs text-[#F5F5F2] font-medium">Method *</Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {methodOptions.map((opt) => (
                   <button
@@ -369,15 +369,15 @@ function NewExperimentContent() {
                     onClick={() => setForm({ ...form, method: opt.value })}
                     className={`flex flex-col text-left p-3 rounded-xl border transition-all ${
                       form.method === opt.value
-                        ? 'border-emerald-500 bg-emerald-500/10 text-white shadow-sm'
-                        : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:border-slate-700 hover:bg-slate-900'
+                        ? 'border-[#F5B94C] bg-[#151719] text-white shadow-sm shadow-[#F5B94C]/10'
+                        : 'border-[#252729] bg-[#151719] text-[#858783] hover:border-[#F5B94C]/40 hover:bg-[#151719]/40'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-base">{opt.icon}</span>
-                      <span className="text-xs font-semibold text-slate-100">{opt.label}</span>
+                      <span className="text-xs font-semibold text-[#F5F5F2]">{opt.label}</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 leading-snug">{opt.desc}</p>
+                    <p className="text-[11px] text-[#858783] leading-snug">{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -385,7 +385,7 @@ function NewExperimentContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="exp-title" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="exp-title" className="text-xs text-[#F5F5F2] font-medium">
                   Experiment Title *
                 </Label>
                 <Input
@@ -393,20 +393,20 @@ function NewExperimentContent() {
                   placeholder="e.g. Pune FPO Willingness-to-Pay Survey"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="exp-city" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="exp-city" className="text-xs text-[#F5F5F2] font-medium">
                   Target City *
                 </Label>
                 <Select
                   id="exp-city"
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                 >
                   {SUPPORTED_CITIES.map((c) => (
                     <option key={c.name} value={c.name}>
@@ -419,7 +419,7 @@ function NewExperimentContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="exp-audience" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="exp-audience" className="text-xs text-[#F5F5F2] font-medium">
                   Target Audience / Cohort
                 </Label>
                 <Input
@@ -427,12 +427,12 @@ function NewExperimentContent() {
                   placeholder="e.g. Horticulture FPO Directors, APMC Cold Store Managers"
                   value={form.target_audience}
                   onChange={(e) => setForm({ ...form, target_audience: e.target.value })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="exp-sample" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="exp-sample" className="text-xs text-[#F5F5F2] font-medium">
                   Sample Size Target (Interviews / Respondents) *
                 </Label>
                 <Input
@@ -442,7 +442,7 @@ function NewExperimentContent() {
                   max={1000}
                   value={form.sample_size_target}
                   onChange={(e) => setForm({ ...form, sample_size_target: Number(e.target.value) })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                   required
                 />
               </div>
@@ -451,19 +451,19 @@ function NewExperimentContent() {
         </Card>
 
         {/* ─── SECTION 3: STRUCTURED SUCCESS THRESHOLD ─── */}
-        <Card className="border-emerald-500/30 bg-emerald-950/10">
+        <Card className="border-[#3A3D40] bg-[#101314]/90">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-emerald-400" />
-              <CardTitle className="text-base text-white">3. Structured Success Threshold</CardTitle>
+              <Target className="h-4 w-4 text-[#F5B94C]" />
+              <CardTitle className="text-base text-[#F5F5F2]">3. Structured Success Threshold</CardTitle>
             </div>
-            <CardDescription className="text-xs text-slate-400">
+            <CardDescription className="text-xs text-[#858783]">
               Define explicit numerical criteria in advance so goalposts cannot be shifted later.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-300 font-medium">Predefined Success Metric</Label>
+              <Label className="text-xs text-[#F5F5F2] font-medium">Predefined Success Metric</Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                 {predefinedMetrics.map((m) => (
                   <button
@@ -472,12 +472,12 @@ function NewExperimentContent() {
                     onClick={() => handleMetricTypeChange(m.id)}
                     className={`text-left p-2.5 rounded-lg border text-xs transition-all ${
                       form.threshold_metric === m.id
-                        ? 'border-emerald-500 bg-emerald-500/15 text-emerald-200'
-                        : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'
+                        ? 'border-[#F5B94C] bg-[#151719] text-[#F5B94C]'
+                        : 'border-[#252729] bg-[#151719] text-[#858783] hover:border-[#F5B94C]/40 hover:bg-[#151719]/40'
                     }`}
                   >
-                    <p className="font-semibold text-slate-200">{m.label}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-1">{m.desc}</p>
+                    <p className="font-semibold text-[#F5F5F2]">{m.label}</p>
+                    <p className="text-[11px] text-[#858783] mt-0.5 line-clamp-1">{m.desc}</p>
                   </button>
                 ))}
               </div>
@@ -485,13 +485,13 @@ function NewExperimentContent() {
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300 font-medium">Operator</Label>
+                <Label className="text-xs text-[#F5F5F2] font-medium">Operator</Label>
                 <Select
                   value={form.threshold_operator}
                   onChange={(e) =>
                     setForm({ ...form, threshold_operator: e.target.value as ThresholdOperator })
                   }
-                  className="bg-slate-950 border-slate-700 text-sm font-mono"
+                  className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] font-mono focus:border-[#F5B94C]"
                 >
                   <option value=">=">&gt;= (At least)</option>
                   <option value=">">&gt; (Strictly greater)</option>
@@ -502,25 +502,25 @@ function NewExperimentContent() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300 font-medium">Target Value *</Label>
+                <Label className="text-xs text-[#F5F5F2] font-medium">Target Value *</Label>
                 <Input
                   type="number"
                   step="any"
                   value={form.threshold_target}
                   onChange={(e) => setForm({ ...form, threshold_target: Number(e.target.value) })}
-                  className="bg-slate-950 border-slate-700 text-sm font-mono"
+                  className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] font-mono focus:border-[#F5B94C]"
                   required
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300 font-medium">Unit</Label>
+                <Label className="text-xs text-[#F5F5F2] font-medium">Unit</Label>
                 <Select
                   value={form.threshold_unit}
                   onChange={(e) =>
                     setForm({ ...form, threshold_unit: e.target.value as ThresholdUnit })
                   }
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] focus:border-[#F5B94C]"
                 >
                   <option value="%">% (Percentage)</option>
                   <option value="count">Count (Units / People)</option>
@@ -530,7 +530,7 @@ function NewExperimentContent() {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs text-slate-300 font-medium">
+                <Label className="text-xs text-[#F5F5F2] font-medium">
                   Min. Sample Guard *
                 </Label>
                 <Input
@@ -540,29 +540,29 @@ function NewExperimentContent() {
                   onChange={(e) =>
                     setForm({ ...form, threshold_min_sample: Number(e.target.value) })
                   }
-                  className="bg-slate-950 border-slate-700 text-sm font-mono"
+                  className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] font-mono focus:border-[#F5B94C]"
                   required
                 />
               </div>
             </div>
 
             {/* Live Computed Threshold Preview */}
-            <div className="p-3.5 rounded-xl border border-emerald-500/40 bg-emerald-950/20 flex items-center justify-between gap-3">
+            <div className="p-3.5 rounded-xl border border-[#3A3D40] bg-[#151719]/60 flex items-center justify-between gap-3 shadow-lg shadow-[#F5B94C]/5">
               <div className="space-y-0.5">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#F5B94C]">
                   Threshold Preview
                 </span>
-                <p className="text-sm font-bold text-white font-mono">
+                <p className="text-sm font-bold text-[#F5F5F2] font-mono">
                   {computedSuccessThreshold}
                 </p>
               </div>
-              <Badge variant="outline" className="text-xs border-emerald-500/50 text-emerald-300">
+              <Badge variant="outline" className="text-xs border-[#3A3D40] bg-[#151719] text-[#FFD27A]">
                 Deterministic
               </Badge>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="exp-rationale" className="text-xs text-slate-300 font-medium">
+              <Label htmlFor="exp-rationale" className="text-xs text-[#F5F5F2] font-medium">
                 Threshold Rationale / Justification
               </Label>
               <Input
@@ -570,9 +570,9 @@ function NewExperimentContent() {
                 placeholder="Why is this specific threshold the bar for viability? (e.g. Unit economics requires 50%+ customer adoption)"
                 value={form.threshold_rationale}
                 onChange={(e) => setForm({ ...form, threshold_rationale: e.target.value })}
-                className="bg-slate-950 border-slate-700 text-sm"
+                className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] focus:border-[#F5B94C]"
               />
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-[#858783]">
                 Any future change to this threshold will be permanently logged in the threshold audit history.
               </p>
             </div>
@@ -580,14 +580,14 @@ function NewExperimentContent() {
         </Card>
 
         {/* ─── SECTION 4: TIMELINE & NOTES ─── */}
-        <Card className="border-slate-800 bg-slate-900/60">
+        <Card className="border-[#252729] bg-[#101314]/90">
           <CardHeader>
-            <CardTitle className="text-base text-white">4. Schedule & Execution Notes</CardTitle>
+            <CardTitle className="text-base text-[#F5F5F2]">4. Schedule & Execution Notes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="exp-start" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="exp-start" className="text-xs text-[#F5F5F2] font-medium">
                   Start Date (Optional)
                 </Label>
                 <Input
@@ -595,12 +595,12 @@ function NewExperimentContent() {
                   type="date"
                   value={form.start_date}
                   onChange={(e) => setForm({ ...form, start_date: e.target.value })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] focus:border-[#F5B94C]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="exp-end" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="exp-end" className="text-xs text-[#F5F5F2] font-medium">
                   End Date (Optional)
                 </Label>
                 <Input
@@ -608,13 +608,13 @@ function NewExperimentContent() {
                   type="date"
                   value={form.end_date}
                   onChange={(e) => setForm({ ...form, end_date: e.target.value })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] focus:border-[#F5B94C]"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="exp-notes" className="text-xs text-slate-300 font-medium">
+              <Label htmlFor="exp-notes" className="text-xs text-[#F5F5F2] font-medium">
                 Execution Notes & Methodology
               </Label>
               <Textarea
@@ -623,7 +623,7 @@ function NewExperimentContent() {
                 placeholder="Interview questionnaire link, recruitment channels, or logistics details..."
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                className="bg-slate-950 border-slate-700 text-sm"
+                className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] focus:border-[#F5B94C]"
               />
             </div>
           </CardContent>
@@ -637,7 +637,7 @@ function NewExperimentContent() {
               variant="ghost"
               size="sm"
               disabled={loading}
-              className="text-slate-400 hover:text-slate-200"
+              className="text-[#858783] hover:text-[#F5F5F2]"
             >
               Cancel
             </Button>
@@ -647,7 +647,7 @@ function NewExperimentContent() {
             type="submit"
             size="sm"
             disabled={loading}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white min-w-[160px] shadow-lg shadow-emerald-950/40"
+            className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold min-w-[160px] shadow-lg shadow-[#F5B94C]/20"
           >
             {loading ? (
               <>

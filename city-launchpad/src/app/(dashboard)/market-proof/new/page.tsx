@@ -75,7 +75,7 @@ export default function NewAssumptionPage() {
       <div className="mb-6">
         <Link
           href="/market-proof"
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-2"
+          className="inline-flex items-center gap-1.5 text-xs text-[#858783] hover:text-[#F5B94C] transition-colors mb-3"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Market Proof
         </Link>
@@ -86,23 +86,23 @@ export default function NewAssumptionPage() {
       </div>
 
       {error && (
-        <div className="mb-6 flex items-center gap-2 rounded-lg border border-rose-800/50 bg-rose-950/30 p-4 text-sm text-rose-300">
-          <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+        <div className="mb-6 flex items-center gap-2 rounded-lg border border-[#4E1821] bg-[#280D11]/40 p-4 text-sm text-[#FB7185]">
+          <AlertCircle className="h-4 w-4 shrink-0 text-[#FB7185]" />
           <span>{error}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
-        <Card className="border-slate-800 bg-slate-900/60 backdrop-blur">
+        <Card className="border-[#252729] bg-[#101314] shadow-xl">
           <CardHeader>
-            <CardTitle className="text-base text-white">Assumption Details</CardTitle>
-            <CardDescription className="text-xs">
+            <CardTitle className="text-base text-[#F5F5F2]">Assumption Details</CardTitle>
+            <CardDescription className="text-xs text-[#858783]">
               What belief about your market, customer, or distribution channel needs to be proven?
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="statement" className="text-xs text-slate-300">
+              <Label htmlFor="statement" className="text-xs text-[#B4B5B2]">
                 Assumption Statement *
               </Label>
               <textarea
@@ -112,20 +112,20 @@ export default function NewAssumptionPage() {
                 onChange={(e) => setStatement(e.target.value)}
                 placeholder="e.g. Retailers in South Bengaluru prefer weekly credit settlements over upfront instant UPI discounts."
                 required
-                className="w-full rounded-md border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-[#252729] bg-[#151719] p-3 text-sm text-[#F5F5F2] placeholder:text-[#858783] focus:border-[#F5B94C] focus:outline-none focus:ring-1 focus:ring-[#F5B94C] transition-colors"
               />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="source_type" className="text-xs text-slate-300">
+                <Label htmlFor="source_type" className="text-xs text-[#B4B5B2]">
                   Origin Source
                 </Label>
                 <select
                   id="source_type"
                   value={sourceType}
                   onChange={(e) => setSourceType(e.target.value as AssumptionSourceType)}
-                  className="w-full rounded-md border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-200"
+                  className="w-full rounded-lg border border-[#252729] bg-[#151719] px-3 py-2 text-xs text-[#F5F5F2] focus:border-[#F5B94C] focus:outline-none"
                 >
                   <option value="manual">Manual Founder Assumption</option>
                   <option value="city-intelligence">Synthesized from City Intelligence</option>
@@ -134,14 +134,14 @@ export default function NewAssumptionPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="status" className="text-xs text-slate-300">
+                <Label htmlFor="status" className="text-xs text-[#B4B5B2]">
                   Initial Status
                 </Label>
                 <select
                   id="status"
                   value={status}
                   onChange={(e) => setStatus(e.target.value as AssumptionStatus)}
-                  className="w-full rounded-md border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-200"
+                  className="w-full rounded-lg border border-[#252729] bg-[#151719] px-3 py-2 text-xs text-[#F5F5F2] focus:border-[#F5B94C] focus:outline-none"
                 >
                   <option value="untested">Untested (No evidence yet)</option>
                   <option value="supported">Supported (Prior proof exists)</option>
@@ -155,14 +155,14 @@ export default function NewAssumptionPage() {
 
         <div className="flex items-center justify-between pt-2">
           <Link href="/market-proof">
-            <Button type="button" variant="ghost" className="text-slate-400">
+            <Button type="button" variant="ghost" className="text-[#858783] hover:text-[#F5F5F2]">
               Cancel
             </Button>
           </Link>
           <Button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-500 text-white gap-2 text-xs"
+            className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold gap-2 text-xs shadow-lg shadow-[#F5B94C]/20"
           >
             {loading ? (
               <>

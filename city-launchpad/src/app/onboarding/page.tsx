@@ -150,19 +150,19 @@ function OnboardingContent() {
               business_description: profile.business_description || '',
               product_desc: profile.product_desc || '',
               target_customer: profile.target_customer || '',
-              target_geography: profile.target_geography || '',
+              target_geography: profile.target_geography || 'Urban India Tier 1 & 2',
               primary_channel: profile.primary_channel || 'B2B Direct Field Sales',
               price_min: profile.price_min != null ? String(profile.price_min) : '',
               price_max: profile.price_max != null ? String(profile.price_max) : '',
               current_city: profile.current_city || 'Bengaluru',
-              expansion_cities: profile.expansion_cities || [],
+              expansion_cities: profile.expansion_cities || ['Mumbai'],
               traction_summary: profile.traction_summary || '',
               expansion_context: profile.expansion_context || '',
             })
           }
         }
       } catch (err) {
-        console.error('Initialization error:', err)
+        console.warn('Could not prefill profile, starting fresh:', err)
       } finally {
         setInitialLoading(false)
       }
@@ -171,10 +171,7 @@ function OnboardingContent() {
     init()
   }, [supabase])
 
-  const handleFieldChange = (
-    field: keyof OnboardingFormData,
-    value: OnboardingFormData[keyof OnboardingFormData]
-  ) => {
+  const handleFieldChange = (field: keyof OnboardingFormData, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors((prev) => {
@@ -185,119 +182,115 @@ function OnboardingContent() {
     }
   }
 
-  const toggleExpansionCity = (cityName: string) => {
-    let next: string[]
-    if (form.expansion_cities.includes(cityName)) {
-      next = form.expansion_cities.filter((c) => c !== cityName)
-    } else {
-      next = [...form.expansion_cities, cityName]
-    }
-    handleFieldChange('expansion_cities', next)
+  const toggleExpansionCity = (city: string) => {
+    setForm((prev) => {
+      const exists = prev.expansion_cities.includes(city)
+      if (exists) {
+        return { ...prev, expansion_cities: prev.expansion_cities.filter((c) => c !== city) }
+      } else {
+        return { ...prev, expansion_cities: [...prev.expansion_cities, city] }
+      }
+    })
   }
 
-  // Step-level validation
-  const validateStep = (stepNumber: number): boolean => {
-    const stepErrors: Record<string, string> = {}
+  const validateStep1 = () => {
+    const errs: Record<string, string> = {}
+    if (!form.name.trim()) errs.name = 'Startup name is required.'
+    if (!form.industry) errs.industry = 'Please select an industry.'
+    if (!form.business_description.trim() || form.business_description.length < 10) {
+      errs.business_description = 'Brief elevator pitch must be at least 10 characters.'
+    }
+    setErrors(errs)
+    return Object.keys(errs).length === 0
+  }
 
-    if (stepNumber === 1) {
-      if (!form.name.trim() || form.name.trim().length < 2) {
-        stepErrors.name = 'Startup name must be at least 2 characters.'
-      }
-      if (!form.business_description.trim() || form.business_description.trim().length < 10) {
-        stepErrors.business_description = 'Provide a short business description (at least 10 characters).'
-      }
-      if (!form.industry.trim()) {
-        stepErrors.industry = 'Please select or enter your industry.'
-      }
-      if (form.website_url.trim()) {
-        try {
-          new URL(form.website_url.trim())
-        } catch {
-          stepErrors.website_url = 'Enter a valid URL (including https://).'
-        }
-      }
-    } else if (stepNumber === 2) {
-      if (!form.product_desc.trim() || form.product_desc.trim().length < 10) {
-        stepErrors.product_desc = 'Describe what your product does (at least 10 characters).'
-      }
-      if (!form.target_customer.trim() || form.target_customer.trim().length < 5) {
-        stepErrors.target_customer = 'Specify your primary target customer segment.'
-      }
-      if (!form.primary_channel.trim()) {
-        stepErrors.primary_channel = 'Select your primary distribution or sales channel.'
-      }
-      if (form.price_min && form.price_max) {
-        const min = Number(form.price_min)
-        const max = Number(form.price_max)
-        if (min < 0) stepErrors.price_min = 'Price cannot be negative.'
-        if (max < 0) stepErrors.price_max = 'Price cannot be negative.'
-        if (min > max) {
-          stepErrors.price_min = 'Minimum price cannot exceed maximum price.'
-        }
-      }
-    } else if (stepNumber === 3) {
-      if (!form.current_city.trim()) {
-        stepErrors.current_city = 'Current operating city is required.'
-      }
+  const validateStep2 = () => {
+    const errs: Record<string, string> = {}
+    if (!form.product_desc.trim() || form.product_desc.length < 10) {
+      errs.product_desc = 'Product/service description must be at least 10 characters.'
+    }
+    if (!form.target_customer.trim()) {
+      errs.target_customer = 'Target customer segment is required.'
+    }
+    if (!form.primary_channel) {
+      errs.primary_channel = 'Please select a primary sales channel.'
     }
 
-    setErrors(stepErrors)
-    return Object.keys(stepErrors).length === 0
+    if (form.price_min && isNaN(Number(form.price_min))) {
+      errs.price_min = 'Min price must be a valid number.'
+    }
+    if (form.price_max && isNaN(Number(form.price_max))) {
+      errs.price_max = 'Max price must be a valid number.'
+    }
+    if (form.price_min && form.price_max && Number(form.price_min) > Number(form.price_max)) {
+      errs.price_max = 'Max price cannot be less than Min price.'
+    }
+
+    setErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
+  const validateStep3 = () => {
+    const errs: Record<string, string> = {}
+    if (!form.current_city) {
+      errs.current_city = 'Current city is required.'
+    }
+    setErrors(errs)
+    return Object.keys(errs).length === 0
   }
 
   const handleNext = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(3, prev + 1))
+    if (currentStep === 1 && validateStep1()) {
+      setCurrentStep(2)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else if (currentStep === 2 && validateStep2()) {
+      setCurrentStep(3)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
   const handleBack = () => {
-    setCurrentStep((prev) => Math.max(1, prev - 1))
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setServerError(null)
 
-    // Full schema parse
+    if (!validateStep3()) return
+
     const payload = {
       name: form.name.trim(),
-      business_description: form.business_description.trim(),
-      industry: form.industry.trim(),
+      website_url: form.website_url.trim() || null,
       stage: form.stage,
+      industry: form.industry,
+      product_category: form.product_category.trim() || null,
+      business_description: form.business_description.trim(),
       product_desc: form.product_desc.trim(),
       target_customer: form.target_customer.trim(),
-      current_city: form.current_city.trim(),
-      price_min: form.price_min ? Number(form.price_min) : undefined,
-      price_max: form.price_max ? Number(form.price_max) : undefined,
-      primary_channel: form.primary_channel.trim(),
-      website_url: form.website_url.trim() || undefined,
-      product_category: form.product_category.trim() || undefined,
-      target_geography: form.target_geography.trim() || undefined,
+      target_geography: form.target_geography.trim() || null,
+      primary_channel: form.primary_channel,
+      price_min: form.price_min ? Number(form.price_min) : null,
+      price_max: form.price_max ? Number(form.price_max) : null,
+      current_city: form.current_city,
       expansion_cities: form.expansion_cities,
-      traction_summary: form.traction_summary.trim() || undefined,
-      expansion_context: form.expansion_context.trim() || undefined,
+      traction_summary: form.traction_summary.trim() || null,
+      expansion_context: form.expansion_context.trim() || null,
     }
 
-    const validation = startupProfileSchema.safeParse(payload)
-    if (!validation.success) {
+    // Validate with Zod schema
+    const parseRes = startupProfileSchema.safeParse(payload)
+    if (!parseRes.success) {
       const fieldErrors: Record<string, string> = {}
-      validation.error.issues.forEach((issue) => {
-        const field = String(issue.path[0])
-        fieldErrors[field] = issue.message
-      })
-      setErrors(fieldErrors)
-
-      // Jump to first step that has an error
-      if (fieldErrors.name || fieldErrors.business_description || fieldErrors.industry || fieldErrors.website_url) {
-        setCurrentStep(1)
-      } else if (fieldErrors.product_desc || fieldErrors.target_customer || fieldErrors.primary_channel || fieldErrors.price_min || fieldErrors.price_max) {
-        setCurrentStep(2)
-      } else {
-        setCurrentStep(3)
+      for (const issue of parseRes.error.issues) {
+        const path = issue.path[0] as string
+        fieldErrors[path] = issue.message
       }
+      setErrors(fieldErrors)
+      setServerError('Please review highlighted fields before submitting.')
       return
     }
 
@@ -305,48 +298,28 @@ function OnboardingContent() {
 
     try {
       const { data: { user } } = await supabase.auth.getUser()
+
       if (!user) {
-        setServerError('Session expired. Please sign in again.')
-        setLoading(false)
+        document.cookie = 'demo_mode=true; path=/; max-age=86400; SameSite=Lax'
+        router.push(returnTo)
         return
       }
 
-      const dbPayload = {
-        name: payload.name,
-        business_description: payload.business_description,
-        industry: payload.industry,
-        stage: payload.stage,
-        product_desc: payload.product_desc,
-        target_customer: payload.target_customer,
-        current_city: payload.current_city,
-        price_min: payload.price_min ?? null,
-        price_max: payload.price_max ?? null,
-        primary_channel: payload.primary_channel,
-        website_url: payload.website_url ?? null,
-        product_category: payload.product_category ?? null,
-        target_geography: payload.target_geography ?? null,
-        expansion_cities: payload.expansion_cities,
-        traction_summary: payload.traction_summary ?? null,
-        expansion_context: payload.expansion_context ?? null,
-      }
+      const { error: upsertError } = await supabase.from('startup_profiles').upsert(
+        {
+          user_id: user.id,
+          ...payload,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
 
-      const { error: saveError } = isEdit
-        ? await supabase
-            .from('startup_profiles')
-            .update(dbPayload)
-            .eq('user_id', user.id)
-        : await supabase
-            .from('startup_profiles')
-            .insert({
-              ...dbPayload,
-              user_id: user.id,
-            })
-
-      if (saveError) {
-        throw new Error(saveError.message)
+      if (upsertError) {
+        throw upsertError
       }
 
       router.push(returnTo)
+      router.refresh()
     } catch (err: unknown) {
       console.error('Error saving profile:', err)
       setServerError(err instanceof Error ? err.message : 'Failed to save startup profile.')
@@ -355,31 +328,31 @@ function OnboardingContent() {
   }
 
   const handleSkip = () => {
-    document.cookie = 'demo_mode=true; path=/; max-age=86400'
+    document.cookie = 'demo_mode=true; path=/; max-age=86400; SameSite=Lax'
     router.push(returnTo)
   }
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
-        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+      <div className="min-h-screen bg-[#080A0B] flex items-center justify-center text-[#858783]">
+        <Loader2 className="h-6 w-6 animate-spin mr-2 text-[#F5B94C]" />
         Loading startup profile...
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between">
+    <div className="min-h-screen bg-[#080A0B] text-[#F5F5F2] flex flex-col justify-between">
       {/* Top Header */}
-      <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-20">
+      <header className="border-b border-[#252729] bg-[#090B0C]/80 backdrop-blur sticky top-0 z-20">
         <div className="mx-auto max-w-4xl px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-500/20">
-              <Rocket className="h-5 w-5" />
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFD27A] to-[#F5B94C] text-[#080A0B] shadow-md shadow-[#F5B94C]/20">
+              <Rocket className="h-5 w-5 fill-current" />
             </div>
             <div>
-              <span className="font-bold text-sm tracking-tight text-white">City Launchpad</span>
-              <p className="text-[11px] text-slate-400">
+              <span className="font-bold text-sm tracking-tight text-[#F5F5F2]">City Launchpad</span>
+              <p className="text-[11px] text-[#858783]">
                 {isEdit ? 'Profile Settings' : 'Founder Onboarding'}
               </p>
             </div>
@@ -389,7 +362,7 @@ function OnboardingContent() {
             variant="ghost"
             size="sm"
             onClick={handleSkip}
-            className="text-xs text-slate-400 hover:text-white"
+            className="text-xs text-[#858783] hover:text-[#F5F5F2] hover:bg-[#151719]"
           >
             {isEdit ? 'Back to Dashboard' : 'Skip for now'}
           </Button>
@@ -401,20 +374,20 @@ function OnboardingContent() {
         <div className="mx-auto max-w-2xl">
           {/* Progress Indicator */}
           <div className="mb-8">
-            <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
-              <span className={currentStep === 1 ? 'text-blue-400 font-semibold' : ''}>
+            <div className="flex items-center justify-between text-xs font-medium text-[#858783] mb-2.5">
+              <span className={currentStep === 1 ? 'text-[#F5B94C] font-semibold' : ''}>
                 1. Identity & Stage
               </span>
-              <span className={currentStep === 2 ? 'text-blue-400 font-semibold' : ''}>
+              <span className={currentStep === 2 ? 'text-[#F5B94C] font-semibold' : ''}>
                 2. Product & Market
               </span>
-              <span className={currentStep === 3 ? 'text-blue-400 font-semibold' : ''}>
+              <span className={currentStep === 3 ? 'text-[#F5B94C] font-semibold' : ''}>
                 3. City & Expansion
               </span>
             </div>
-            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-[#151719] rounded-full overflow-hidden border border-[#252729]">
               <div
-                className="h-full bg-blue-500 transition-all duration-300"
+                className="h-full bg-[#F5B94C] transition-all duration-300"
                 style={{ width: `${(currentStep / 3) * 100}%` }}
               />
             </div>
@@ -423,25 +396,25 @@ function OnboardingContent() {
           {serverError && (
             serverError.toLowerCase().includes('startup_profiles') ||
             serverError.toLowerCase().includes('schema cache') ? (
-              <div className="mb-6 rounded-lg border border-amber-800/60 bg-amber-950/40 p-4 text-xs text-amber-200 shadow-lg">
+              <div className="mb-6 rounded-xl border border-[#4E3516] bg-[#2A1D0B]/40 p-4 text-xs text-[#F5B94C] shadow-lg">
                 <div className="flex items-start gap-3">
-                  <Database className="h-5 w-5 shrink-0 text-amber-400 mt-0.5" />
+                  <Database className="h-5 w-5 shrink-0 text-[#F5B94C] mt-0.5" />
                   <div className="space-y-2 flex-1">
-                    <p className="font-semibold text-amber-300 text-sm">
+                    <p className="font-semibold text-[#F5B94C] text-sm">
                       Database Schema Setup Required in Supabase
                     </p>
-                    <p className="text-slate-300 leading-relaxed">
-                      The table <code className="px-1.5 py-0.5 rounded bg-slate-900 font-mono text-amber-300 text-[11px]">public.startup_profiles</code> has not been created in your Supabase project yet.
+                    <p className="text-[#B4B5B2] leading-relaxed">
+                      The table <code className="px-1.5 py-0.5 rounded bg-[#101314] border border-[#252729] font-mono text-[#F5B94C] text-[11px]">public.startup_profiles</code> has not been created in your Supabase project yet.
                     </p>
-                    <p className="text-slate-400 leading-relaxed">
-                      To create all tables in 30 seconds, copy and execute <code className="px-1.5 py-0.5 rounded bg-slate-900 font-mono text-blue-300 text-[11px]">supabase/combined_migrations.sql</code> in your Supabase SQL Editor.
+                    <p className="text-[#858783] leading-relaxed">
+                      To create all tables in 30 seconds, copy and execute <code className="px-1.5 py-0.5 rounded bg-[#101314] border border-[#252729] font-mono text-[#F5B94C] text-[11px]">supabase/combined_migrations.sql</code> in your Supabase SQL Editor.
                     </p>
                     <div className="flex flex-wrap items-center gap-3 pt-2">
                       <Button
                         type="button"
                         size="sm"
                         onClick={handleSkip}
-                        className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold text-xs"
+                        className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold text-xs"
                       >
                         Explore in Demo Mode Now
                       </Button>
@@ -449,7 +422,7 @@ function OnboardingContent() {
                         href="https://supabase.com/dashboard/project/tgnmtohepifungxgenwl/sql/new"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 underline underline-offset-4"
+                        className="inline-flex items-center gap-1 text-xs text-[#F5B94C] hover:text-[#FFD27A] underline underline-offset-4"
                       >
                         Open Supabase SQL Editor <ExternalLink className="h-3 w-3" />
                       </a>
@@ -458,8 +431,8 @@ function OnboardingContent() {
                 </div>
               </div>
             ) : (
-              <div className="mb-6 flex items-center gap-2 rounded-lg border border-rose-800/50 bg-rose-950/40 p-4 text-xs text-rose-300">
-                <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+              <div className="mb-6 flex items-center gap-2 rounded-lg border border-[#4E1821] bg-[#280D11]/40 p-4 text-xs text-[#FB7185]">
+                <AlertCircle className="h-4 w-4 shrink-0 text-[#FB7185]" />
                 <span>{serverError}</span>
               </div>
             )
@@ -468,20 +441,20 @@ function OnboardingContent() {
           <form onSubmit={handleSubmit}>
             {/* STEP 1: Startup Identity & Stage */}
             {currentStep === 1 && (
-              <Card className="border-slate-800 bg-slate-900/60 backdrop-blur shadow-xl">
+              <Card className="border-[#252729] bg-[#101314] shadow-2xl">
                 <CardHeader>
-                  <div className="flex items-center gap-2 text-blue-400 text-xs font-semibold uppercase tracking-wider">
+                  <div className="flex items-center gap-2 text-[#F5B94C] text-xs font-semibold uppercase tracking-wider font-mono">
                     <Building2 className="h-4 w-4" /> Step 1 of 3
                   </div>
-                  <CardTitle className="text-xl text-white">Startup Identity & Stage</CardTitle>
-                  <CardDescription className="text-xs">
+                  <CardTitle className="text-xl text-[#F5F5F2]">Startup Identity & Stage</CardTitle>
+                  <CardDescription className="text-xs text-[#858783]">
                     Define who you are and what developmental stage your venture is currently in.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-5">
                   {/* Startup Name */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="name" className="text-xs text-slate-300">
+                    <Label htmlFor="name" className="text-xs text-[#B4B5B2]">
                       Startup Name *
                     </Label>
                     <Input
@@ -489,19 +462,19 @@ function OnboardingContent() {
                       value={form.name}
                       onChange={(e) => handleFieldChange('name', e.target.value)}
                       placeholder="e.g. Bharat Logistics, KiranaStack, GreenKart"
-                      className="bg-slate-950/70 border-slate-700 text-sm"
+                      className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] placeholder-[#858783] focus:border-[#F5B94C]"
                       autoFocus
                     />
-                    {errors.name && <p className="text-xs text-rose-400">{errors.name}</p>}
+                    {errors.name && <p className="text-xs text-[#FB7185]">{errors.name}</p>}
                   </div>
 
                   {/* Website URL (optional) */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="website_url" className="text-xs text-slate-300">
-                        Website or Pitch URL <span className="text-slate-500 font-normal">(optional)</span>
+                      <Label htmlFor="website_url" className="text-xs text-[#B4B5B2]">
+                        Website or Pitch URL <span className="text-[#858783] font-normal">(optional)</span>
                       </Label>
-                      <span className="text-[11px] text-slate-500">Include https://</span>
+                      <span className="text-[11px] text-[#858783]">Include https://</span>
                     </div>
                     <Input
                       id="website_url"
@@ -509,16 +482,16 @@ function OnboardingContent() {
                       value={form.website_url}
                       onChange={(e) => handleFieldChange('website_url', e.target.value)}
                       placeholder="https://example.com"
-                      className="bg-slate-950/70 border-slate-700 text-sm"
+                      className="bg-[#151719] border-[#252729] text-sm text-[#F5F5F2] placeholder-[#858783] focus:border-[#F5B94C]"
                     />
                     {errors.website_url && (
-                      <p className="text-xs text-rose-400">{errors.website_url}</p>
+                      <p className="text-xs text-[#FB7185]">{errors.website_url}</p>
                     )}
                   </div>
 
                   {/* Stage Selector */}
                   <div className="space-y-2">
-                    <Label className="text-xs text-slate-300">Current Stage *</Label>
+                    <Label className="text-xs text-[#B4B5B2]">Current Stage *</Label>
                     <div className="grid gap-2.5 sm:grid-cols-2">
                       {STAGES.map((s) => {
                         const isSelected = form.stage === s.value
@@ -526,17 +499,17 @@ function OnboardingContent() {
                           <div
                             key={s.value}
                             onClick={() => handleFieldChange('stage', s.value)}
-                            className={`cursor-pointer rounded-lg border p-3 transition-all ${
+                            className={`cursor-pointer rounded-xl border p-3.5 transition-all duration-200 ${
                               isSelected
-                                ? 'border-blue-500 bg-blue-950/30 shadow-md'
-                                : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'
+                                ? 'border-[#F5B94C] bg-[#151719] shadow-lg shadow-[#F5B94C]/10'
+                                : 'border-[#252729] bg-[#151719]/40 hover:border-[#3A3D40]'
                             }`}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-xs font-semibold text-slate-100">{s.label}</span>
-                              {isSelected && <CheckCircle2 className="h-3.5 w-3.5 text-blue-400" />}
+                              <span className={`text-xs font-semibold ${isSelected ? 'text-[#F5B94C]' : 'text-[#F5F5F2]'}`}>{s.label}</span>
+                              {isSelected && <CheckCircle2 className="h-3.5 w-3.5 text-[#F5B94C]" />}
                             </div>
-                            <p className="text-[11px] text-slate-400 mt-1 leading-snug">{s.desc}</p>
+                            <p className="text-[11px] text-[#858783] mt-1 leading-snug">{s.desc}</p>
                           </div>
                         )
                       })}
@@ -546,14 +519,14 @@ function OnboardingContent() {
                   {/* Industry & Subcategory */}
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                      <Label htmlFor="industry" className="text-xs text-slate-300">
+                      <Label htmlFor="industry" className="text-xs text-[#B4B5B2]">
                         Industry / Category *
                       </Label>
                       <select
                         id="industry"
                         value={form.industry}
                         onChange={(e) => handleFieldChange('industry', e.target.value)}
-                        className="w-full rounded-md border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-lg border border-[#252729] bg-[#151719] px-3 py-2 text-xs text-[#F5F5F2] focus:border-[#F5B94C] focus:outline-none"
                       >
                         {INDUSTRIES.map((ind) => (
                           <option key={ind} value={ind}>
@@ -561,19 +534,19 @@ function OnboardingContent() {
                           </option>
                         ))}
                       </select>
-                      {errors.industry && <p className="text-xs text-rose-400">{errors.industry}</p>}
+                      {errors.industry && <p className="text-xs text-[#FB7185]">{errors.industry}</p>}
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="product_category" className="text-xs text-slate-300">
-                        Niche / Subcategory <span className="text-slate-500 font-normal">(optional)</span>
+                      <Label htmlFor="product_category" className="text-xs text-[#B4B5B2]">
+                        Niche / Subcategory <span className="text-[#858783] font-normal">(optional)</span>
                       </Label>
                       <Input
                         id="product_category"
                         value={form.product_category}
                         onChange={(e) => handleFieldChange('product_category', e.target.value)}
                         placeholder="e.g. Cold Chain, POS Billing, Artisanal Tea"
-                        className="bg-slate-950/70 border-slate-700 text-xs"
+                        className="bg-[#151719] border-[#252729] text-xs text-[#F5F5F2] placeholder-[#858783] focus:border-[#F5B94C]"
                       />
                     </div>
                   </div>
@@ -581,10 +554,10 @@ function OnboardingContent() {
                   {/* Short Business Description */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="business_description" className="text-xs text-slate-300">
+                      <Label htmlFor="business_description" className="text-xs text-[#B4B5B2]">
                         Short Elevator Pitch (One-Liner) *
                       </Label>
-                      <span className="text-[10px] text-slate-500">10–500 chars</span>
+                      <span className="text-[10px] text-[#858783]">10–500 chars</span>
                     </div>
                     <textarea
                       id="business_description"
@@ -592,10 +565,10 @@ function OnboardingContent() {
                       value={form.business_description}
                       onChange={(e) => handleFieldChange('business_description', e.target.value)}
                       placeholder="e.g. AI-powered inventory replenishment and automated invoicing for neighbourhood kirana stores."
-                      className="w-full rounded-md border border-slate-700 bg-slate-950/70 p-2.5 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-[#252729] bg-[#151719] p-2.5 text-xs text-[#F5F5F2] placeholder:text-[#858783] focus:border-[#F5B94C] focus:outline-none focus:ring-1 focus:ring-[#F5B94C]"
                     />
                     {errors.business_description && (
-                      <p className="text-xs text-rose-400">{errors.business_description}</p>
+                      <p className="text-xs text-[#FB7185]">{errors.business_description}</p>
                     )}
                   </div>
                 </CardContent>
@@ -604,20 +577,20 @@ function OnboardingContent() {
 
             {/* STEP 2: Product, Customers & Channels */}
             {currentStep === 2 && (
-              <Card className="border-slate-800 bg-slate-900/60 backdrop-blur shadow-xl">
+              <Card className="border-[#252729] bg-[#101314] shadow-2xl">
                 <CardHeader>
-                  <div className="flex items-center gap-2 text-blue-400 text-xs font-semibold uppercase tracking-wider">
+                  <div className="flex items-center gap-2 text-[#F5B94C] text-xs font-semibold uppercase tracking-wider font-mono">
                     <Tag className="h-4 w-4" /> Step 2 of 3
                   </div>
-                  <CardTitle className="text-xl text-white">Product, Customers & Pricing</CardTitle>
-                  <CardDescription className="text-xs">
+                  <CardTitle className="text-xl text-[#F5F5F2]">Product, Customers & Pricing</CardTitle>
+                  <CardDescription className="text-xs text-[#858783]">
                     Explain what you deliver, who pays, and how products reach end buyers.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-5">
                   {/* Detailed Product Description */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="product_desc" className="text-xs text-slate-300">
+                    <Label htmlFor="product_desc" className="text-xs text-[#B4B5B2]">
                       Product or Service Offering *
                     </Label>
                     <textarea
@@ -626,17 +599,17 @@ function OnboardingContent() {
                       value={form.product_desc}
                       onChange={(e) => handleFieldChange('product_desc', e.target.value)}
                       placeholder="e.g. A lightweight mobile app allowing store owners to scan distributor barcodes, reconcile GST credit in real time, and request 14-day working capital loans."
-                      className="w-full rounded-md border border-slate-700 bg-slate-950/70 p-2.5 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-[#252729] bg-[#151719] p-2.5 text-xs text-[#F5F5F2] placeholder:text-[#858783] focus:border-[#F5B94C] focus:outline-none focus:ring-1 focus:ring-[#F5B94C]"
                     />
                     {errors.product_desc && (
-                      <p className="text-xs text-rose-400">{errors.product_desc}</p>
+                      <p className="text-xs text-[#FB7185]">{errors.product_desc}</p>
                     )}
                   </div>
 
                   {/* Target Customer Segment */}
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                      <Label htmlFor="target_customer" className="text-xs text-slate-300">
+                      <Label htmlFor="target_customer" className="text-xs text-[#B4B5B2]">
                         Target Customer Segment *
                       </Label>
                       <Input
@@ -644,37 +617,37 @@ function OnboardingContent() {
                         value={form.target_customer}
                         onChange={(e) => handleFieldChange('target_customer', e.target.value)}
                         placeholder="e.g. Independent Grocery Retailers"
-                        className="bg-slate-950/70 border-slate-700 text-xs"
+                        className="bg-[#151719] border-[#252729] text-xs text-[#F5F5F2] placeholder-[#858783] focus:border-[#F5B94C]"
                       />
                       {errors.target_customer && (
-                        <p className="text-xs text-rose-400">{errors.target_customer}</p>
+                        <p className="text-xs text-[#FB7185]">{errors.target_customer}</p>
                       )}
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="target_geography" className="text-xs text-slate-300">
-                        Target Geography Focus <span className="text-slate-500 font-normal">(optional)</span>
+                      <Label htmlFor="target_geography" className="text-xs text-[#B4B5B2]">
+                        Target Geography Focus <span className="text-[#858783] font-normal">(optional)</span>
                       </Label>
                       <Input
                         id="target_geography"
                         value={form.target_geography}
                         onChange={(e) => handleFieldChange('target_geography', e.target.value)}
                         placeholder="e.g. High-density residential catchments"
-                        className="bg-slate-950/70 border-slate-700 text-xs"
+                        className="bg-[#151719] border-[#252729] text-xs text-[#F5F5F2] placeholder-[#858783] focus:border-[#F5B94C]"
                       />
                     </div>
                   </div>
 
                   {/* Primary Sales / Distribution Channel */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="primary_channel" className="text-xs text-slate-300">
+                    <Label htmlFor="primary_channel" className="text-xs text-[#B4B5B2]">
                       Primary Sales / Distribution Channel *
                     </Label>
                     <select
                       id="primary_channel"
                       value={form.primary_channel}
                       onChange={(e) => handleFieldChange('primary_channel', e.target.value)}
-                      className="w-full rounded-md border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-[#252729] bg-[#151719] px-3 py-2 text-xs text-[#F5F5F2] focus:border-[#F5B94C] focus:outline-none"
                     >
                       {CHANNELS.map((ch) => (
                         <option key={ch} value={ch}>
@@ -683,22 +656,22 @@ function OnboardingContent() {
                       ))}
                     </select>
                     {errors.primary_channel && (
-                      <p className="text-xs text-rose-400">{errors.primary_channel}</p>
+                      <p className="text-xs text-[#FB7185]">{errors.primary_channel}</p>
                     )}
                   </div>
 
-                  {/* Price Range (optional / when applicable) */}
-                  <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4 space-y-3">
+                  {/* Price Range */}
+                  <div className="rounded-xl border border-[#252729] bg-[#151719]/50 p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                        <DollarSign className="h-3.5 w-3.5 text-blue-400" /> Price or Price Range (INR)
+                      <span className="text-xs font-semibold text-[#F5F5F2] flex items-center gap-1.5">
+                        <DollarSign className="h-3.5 w-3.5 text-[#F5B94C]" /> Price or Price Range (INR)
                       </span>
-                      <span className="text-[11px] text-slate-500">Leave blank if pre-pricing</span>
+                      <span className="text-[11px] text-[#858783]">Leave blank if pre-pricing</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <Label htmlFor="price_min" className="text-[11px] text-slate-400">
+                        <Label htmlFor="price_min" className="text-[11px] text-[#858783]">
                           Min Price (₹)
                         </Label>
                         <Input
@@ -708,11 +681,11 @@ function OnboardingContent() {
                           value={form.price_min}
                           onChange={(e) => handleFieldChange('price_min', e.target.value)}
                           placeholder="e.g. 499"
-                          className="bg-slate-950 border-slate-700 text-xs"
+                          className="bg-[#101314] border-[#252729] text-xs text-[#F5F5F2] focus:border-[#F5B94C]"
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label htmlFor="price_max" className="text-[11px] text-slate-400">
+                        <Label htmlFor="price_max" className="text-[11px] text-[#858783]">
                           Max Price (₹)
                         </Label>
                         <Input
@@ -722,12 +695,12 @@ function OnboardingContent() {
                           value={form.price_max}
                           onChange={(e) => handleFieldChange('price_max', e.target.value)}
                           placeholder="e.g. 1999"
-                          className="bg-slate-950 border-slate-700 text-xs"
+                          className="bg-[#101314] border-[#252729] text-xs text-[#F5F5F2] focus:border-[#F5B94C]"
                         />
                       </div>
                     </div>
-                    {errors.price_min && <p className="text-xs text-rose-400">{errors.price_min}</p>}
-                    {errors.price_max && <p className="text-xs text-rose-400">{errors.price_max}</p>}
+                    {errors.price_min && <p className="text-xs text-[#FB7185]">{errors.price_min}</p>}
+                    {errors.price_max && <p className="text-xs text-[#FB7185]">{errors.price_max}</p>}
                   </div>
                 </CardContent>
               </Card>
@@ -735,13 +708,13 @@ function OnboardingContent() {
 
             {/* STEP 3: City & Expansion Goals */}
             {currentStep === 3 && (
-              <Card className="border-slate-800 bg-slate-900/60 backdrop-blur shadow-xl">
+              <Card className="border-[#252729] bg-[#101314] shadow-2xl">
                 <CardHeader>
-                  <div className="flex items-center gap-2 text-blue-400 text-xs font-semibold uppercase tracking-wider">
+                  <div className="flex items-center gap-2 text-[#F5B94C] text-xs font-semibold uppercase tracking-wider font-mono">
                     <MapPin className="h-4 w-4" /> Step 3 of 3
                   </div>
-                  <CardTitle className="text-xl text-white">City & Expansion Geography</CardTitle>
-                  <CardDescription className="text-xs">
+                  <CardTitle className="text-xl text-[#F5F5F2]">City & Expansion Geography</CardTitle>
+                  <CardDescription className="text-xs text-[#858783]">
                     Indicate your home hub and which candidate cities you want to evaluate.
                   </CardDescription>
                 </CardHeader>
@@ -749,16 +722,16 @@ function OnboardingContent() {
                   {/* Current Operating City */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="current_city" className="text-xs text-slate-300">
+                      <Label htmlFor="current_city" className="text-xs text-[#B4B5B2]">
                         Current Operating City *
                       </Label>
-                      <span className="text-[11px] text-slate-500">Loaded from database catalog</span>
+                      <span className="text-[11px] text-[#858783]">Loaded from database catalog</span>
                     </div>
                     <select
                       id="current_city"
                       value={form.current_city}
                       onChange={(e) => handleFieldChange('current_city', e.target.value)}
-                      className="w-full rounded-md border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-[#252729] bg-[#151719] px-3 py-2 text-xs text-[#F5F5F2] focus:border-[#F5B94C] focus:outline-none"
                     >
                       {citiesCatalog.map((c) => (
                         <option key={c.name} value={c.name}>
@@ -767,18 +740,18 @@ function OnboardingContent() {
                       ))}
                     </select>
                     {errors.current_city && (
-                      <p className="text-xs text-rose-400">{errors.current_city}</p>
+                      <p className="text-xs text-[#FB7185]">{errors.current_city}</p>
                     )}
                   </div>
 
                   {/* Candidate Expansion Cities */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs text-slate-300">
+                      <Label className="text-xs text-[#B4B5B2]">
                         Candidate Expansion Cities{' '}
-                        <span className="text-slate-500 font-normal">(select target markets)</span>
+                        <span className="text-[#858783] font-normal">(select target markets)</span>
                       </Label>
-                      <span className="text-[11px] text-blue-400">
+                      <span className="text-[11px] text-[#F5B94C] font-mono">
                         {form.expansion_cities.length} selected
                       </span>
                     </div>
@@ -791,22 +764,22 @@ function OnboardingContent() {
                           <div
                             key={city.name}
                             onClick={() => !isHome && toggleExpansionCity(city.name)}
-                            className={`cursor-pointer rounded-lg border p-2.5 transition-all text-xs flex items-center justify-between ${
+                            className={`cursor-pointer rounded-xl border p-3 transition-all duration-200 text-xs flex items-center justify-between ${
                               isHome
-                                ? 'border-slate-800 bg-slate-900/30 opacity-60 cursor-not-allowed'
+                                ? 'border-[#252729] bg-[#101314]/40 opacity-50 cursor-not-allowed'
                                 : isSelected
-                                ? 'border-blue-500 bg-blue-950/40 text-blue-200'
-                                : 'border-slate-800 bg-slate-950/40 hover:border-slate-700 text-slate-400'
+                                ? 'border-[#F5B94C] bg-[#151719] text-[#F5B94C]'
+                                : 'border-[#252729] bg-[#151719]/40 hover:border-[#3A3D40] text-[#858783]'
                             }`}
                           >
                             <div>
-                              <span className="font-semibold block text-slate-200">{city.name}</span>
-                              <span className="text-[10px] text-slate-500">
+                              <span className={`font-semibold block ${isSelected ? 'text-[#F5B94C]' : 'text-[#F5F5F2]'}`}>{city.name}</span>
+                              <span className="text-[10px] text-[#858783]">
                                 {isHome ? 'Home City' : city.state}
                               </span>
                             </div>
                             {isSelected && !isHome && (
-                              <CheckCircle2 className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+                              <CheckCircle2 className="h-4 w-4 text-[#F5B94C] shrink-0" />
                             )}
                           </div>
                         )
@@ -817,10 +790,10 @@ function OnboardingContent() {
                   {/* Existing Traction (optional) */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="traction_summary" className="text-xs text-slate-300">
-                        Existing Traction / Milestone <span className="text-slate-500 font-normal">(optional)</span>
+                      <Label htmlFor="traction_summary" className="text-xs text-[#B4B5B2]">
+                        Existing Traction / Milestone <span className="text-[#858783] font-normal">(optional)</span>
                       </Label>
-                      <span className="text-[11px] text-slate-500">Be honest; leave blank if zero</span>
+                      <span className="text-[11px] text-[#858783]">Be honest; leave blank if zero</span>
                     </div>
                     <textarea
                       id="traction_summary"
@@ -828,14 +801,14 @@ function OnboardingContent() {
                       value={form.traction_summary}
                       onChange={(e) => handleFieldChange('traction_summary', e.target.value)}
                       placeholder="e.g. 45 pilot retailers live in Bengaluru with ₹3.2L GMV/month, 88% monthly retention."
-                      className="w-full rounded-md border border-slate-700 bg-slate-950/70 p-2.5 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-[#252729] bg-[#151719] p-2.5 text-xs text-[#F5F5F2] placeholder:text-[#858783] focus:border-[#F5B94C] focus:outline-none focus:ring-1 focus:ring-[#F5B94C]"
                     />
                   </div>
 
                   {/* Expansion Context (optional) */}
                   <div className="space-y-1.5">
-                    <Label htmlFor="expansion_context" className="text-xs text-slate-300">
-                      Expansion Goals or Key Constraints <span className="text-slate-500 font-normal">(optional)</span>
+                    <Label htmlFor="expansion_context" className="text-xs text-[#B4B5B2]">
+                      Expansion Goals or Key Constraints <span className="text-[#858783] font-normal">(optional)</span>
                     </Label>
                     <textarea
                       id="expansion_context"
@@ -843,7 +816,7 @@ function OnboardingContent() {
                       value={form.expansion_context}
                       onChange={(e) => handleFieldChange('expansion_context', e.target.value)}
                       placeholder="e.g. Planning Q3 expansion into Mumbai and Delhi-NCR. Seeking cold-chain distributor networks and B2B pilot accounts."
-                      className="w-full rounded-md border border-slate-700 bg-slate-950/70 p-2.5 text-xs text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-[#252729] bg-[#151719] p-2.5 text-xs text-[#F5F5F2] placeholder:text-[#858783] focus:border-[#F5B94C] focus:outline-none focus:ring-1 focus:ring-[#F5B94C]"
                     />
                   </div>
                 </CardContent>
@@ -857,7 +830,7 @@ function OnboardingContent() {
                   type="button"
                   variant="outline"
                   onClick={handleBack}
-                  className="border-slate-800 text-slate-300 hover:bg-slate-900 text-xs gap-1.5"
+                  className="border-[#252729] text-[#858783] hover:text-[#F5F5F2] hover:bg-[#151719] text-xs gap-1.5"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" /> Previous
                 </Button>
@@ -869,7 +842,7 @@ function OnboardingContent() {
                 <Button
                   type="button"
                   onClick={handleNext}
-                  className="bg-blue-600 hover:bg-blue-500 text-white text-xs gap-1.5"
+                  className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold text-xs gap-1.5 shadow-md shadow-[#F5B94C]/20"
                 >
                   Continue <ChevronRight className="h-3.5 w-3.5" />
                 </Button>
@@ -878,7 +851,7 @@ function OnboardingContent() {
                   type="submit"
                   disabled={loading}
                   id="btn-save-startup-profile"
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs gap-1.5 min-w-36"
+                  className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold text-xs gap-1.5 min-w-36 shadow-lg shadow-[#F5B94C]/25"
                 >
                   {loading ? (
                     <>
@@ -899,7 +872,7 @@ function OnboardingContent() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 py-4 text-center text-xs text-slate-600">
+      <footer className="border-t border-[#252729] py-4 text-center text-xs text-[#858783]">
         City Launchpad • AI-Assisted Local Market Entry for Indian Startups
       </footer>
     </div>
@@ -910,8 +883,8 @@ export default function OnboardingPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
+        <div className="min-h-screen bg-[#080A0B] flex items-center justify-center text-[#858783]">
+          <Loader2 className="h-6 w-6 animate-spin mr-2 text-[#F5B94C]" />
           Loading onboarding...
         </div>
       }

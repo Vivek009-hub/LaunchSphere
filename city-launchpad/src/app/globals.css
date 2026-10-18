@@ -2,8 +2,28 @@
 
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --color-background: oklch(0.09 0.008 264);
-  --color-foreground: oklch(0.92 0.01 250);
+
+  /* Midnight Gold Palette Tokens */
+  --color-background: #080A0B;
+  --color-sidebar: #090B0C;
+  --color-surface: #101314;
+  --color-surface-raised: #151719;
+  --color-surface-hover: #1A1D20;
+  --color-border: #252729;
+  --color-border-strong: #3A3D40;
+  
+  --color-gold: #F5B94C;
+  --color-gold-bright: #FFD27A;
+  --color-gold-deep: #9A6B22;
+
+  --color-text-primary: #F5F5F2;
+  --color-text-secondary: #B4B5B2;
+  --color-text-muted: #858783;
+
+  --color-warning: #F5B94C;
+  --color-danger: #F87171;
+  --color-success: #10B981;
+  --color-info: #38BDF8;
 }
 
 /* Global base styles */
@@ -14,81 +34,93 @@
 
   html {
     scroll-behavior: smooth;
+    background-color: #080A0B;
+    color: #F5F5F2;
   }
 
   body {
-    @apply bg-slate-950 text-slate-200 antialiased;
+    background-color: #080A0B;
+    color: #F5F5F2;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Custom scrollbar */
+  /* Custom Midnight Gold scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-slate-900;
+    background-color: #080A0B;
   }
   ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-slate-700;
+    border-radius: 9999px;
+    background-color: #252729;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-600;
+    background-color: #3A3D40;
   }
 }
 
-/* Gradient mesh background used on auth pages */
-.mesh-bg {
-  background-color: #020817;
-  background-image:
-    radial-gradient(at 20% 20%, oklch(0.35 0.15 264 / 0.4) 0px, transparent 50%),
-    radial-gradient(at 80% 80%, oklch(0.30 0.12 300 / 0.3) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, oklch(0.20 0.05 264 / 0.2) 0px, transparent 70%);
+/* Midnight Gold Surface Utilities */
+.bg-app {
+  background-color: #080A0B;
 }
 
-/* Glassmorphism card */
-.glass {
-  @apply border border-white/5 bg-white/5 backdrop-blur-md;
+.bg-sidebar {
+  background-color: #090B0C;
 }
 
-/* Gradient text */
-.gradient-text {
-  @apply bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent;
+.bg-surface {
+  background-color: #101314;
 }
 
-/* Animated gradient border */
-.gradient-border {
-  position: relative;
-}
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+.bg-surface-raised {
+  background-color: #151719;
 }
 
-/* Pulse animation for active experiment */
-@keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 oklch(0.6 0.2 264 / 0.4); }
-  70% { box-shadow: 0 0 0 8px oklch(0.6 0.2 264 / 0); }
-  100% { box-shadow: 0 0 0 0 oklch(0.6 0.2 264 / 0); }
+.bg-surface-hover {
+  background-color: #1A1D20;
 }
 
-.pulse-active {
-  animation: pulse-ring 2s infinite;
+.border-subtle {
+  border-color: #252729;
 }
 
-/* Score gauge arc (SVG-based, rendered in component) */
-.score-gauge-track {
-  stroke: oklch(0.25 0.02 264);
+.border-strong {
+  border-color: #3A3D40;
 }
-.score-gauge-fill {
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Restrained Gold Glow */
+.gold-glow {
+  box-shadow: 0 0 25px -5px rgba(245, 185, 76, 0.2);
+}
+
+.gold-glow-sm {
+  box-shadow: 0 0 15px -3px rgba(245, 185, 76, 0.15);
+}
+
+/* Gold Gradient Accents */
+.gold-gradient {
+  background: linear-gradient(135deg, rgba(245, 185, 76, 0.18) 0%, rgba(154, 107, 34, 0.05) 100%);
+}
+
+.gold-gradient-button {
+  background: linear-gradient(180deg, #FFD27A 0%, #F5B94C 100%);
+}
+
+.gold-pill-active {
+  background: linear-gradient(90deg, rgba(245, 185, 76, 0.15) 0%, rgba(245, 185, 76, 0.05) 100%);
+  border-left: 3px solid #F5B94C;
+}
+
+/* Radial Dark Glow */
+.radial-dark-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(245, 185, 76, 0.08) 0%, rgba(8, 10, 11, 0) 70%);
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }

@@ -278,25 +278,25 @@ export function LocalConnectClient({
 
       {/* Active Startup Context Bar */}
       {hasProfile && startupProfile && (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/40 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+        <div className="rounded-lg border border-[#252729] bg-[#101314]/90 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs text-[#858783]">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-slate-500">Matching profile for:</span>
-            <span className="font-semibold text-slate-200">{startupProfile.name}</span>
-            <span className="text-slate-600">·</span>
-            <Badge variant="outline" className="text-[11px] border-slate-700 text-slate-300">
+            <span className="text-[#858783]">Matching profile for:</span>
+            <span className="font-semibold text-[#F5F5F2]">{startupProfile.name}</span>
+            <span className="text-[#252729]">·</span>
+            <Badge variant="outline" className="text-[11px] border-[#252729] bg-[#151719] text-[#858783]">
               {startupProfile.industry}
             </Badge>
             {startupProfile.current_city && (
-              <span className="text-slate-400">Base: {startupProfile.current_city}</span>
+              <span className="text-[#858783]">Base: {startupProfile.current_city}</span>
             )}
             {startupProfile.expansion_cities && startupProfile.expansion_cities.length > 0 && (
-              <span className="text-indigo-400">
+              <span className="text-[#F5B94C]">
                 Targeting: {startupProfile.expansion_cities.join(', ')}
               </span>
             )}
           </div>
-          <div className="text-[11px] text-slate-500 flex items-center gap-1">
-            <Sparkles className="h-3 w-3 text-indigo-400" /> Deterministic 100-pt Scoring Engine
+          <div className="text-[11px] text-[#858783] flex items-center gap-1 font-mono">
+            <Sparkles className="h-3 w-3 text-[#F5B94C]" /> Deterministic 100-pt Scoring Engine
           </div>
         </div>
       )}
@@ -313,7 +313,7 @@ export function LocalConnectClient({
           <span>{feedbackMessage.text}</span>
           <button
             onClick={() => setFeedbackMessage(null)}
-            className="text-slate-400 hover:text-white ml-2"
+            className="text-[#858783] hover:text-[#F5F5F2] ml-2"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -324,17 +324,17 @@ export function LocalConnectClient({
       {activeTab === 'directory' && (
         <div className="space-y-6">
           {/* Discovery Filter Controls */}
-          <Card className="border-slate-800 bg-slate-900/60 backdrop-blur">
+          <Card className="border-[#252729] bg-[#101314]/90 backdrop-blur">
             <CardContent className="p-4 space-y-3">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {/* Search query */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-500" />
+                  <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#858783]" />
                   <Input
                     placeholder="Search name, capability, tags..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 bg-slate-950 border-slate-700 text-xs h-9"
+                    className="pl-8 bg-[#151719] border-[#252729] text-xs h-9 text-[#F5F5F2] placeholder-[#858783]/60 focus:border-[#F5B94C]"
                     id="search-input"
                   />
                 </div>
@@ -344,7 +344,7 @@ export function LocalConnectClient({
                   <select
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
-                    className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 h-9"
+                    className="w-full rounded-md border border-[#252729] bg-[#151719] px-3 py-1.5 text-xs text-[#F5F5F2] focus:outline-none focus:border-[#F5B94C] focus:ring-1 focus:ring-[#F5B94C] h-9"
                     id="filter-city"
                   >
                     <option value="all">All Cities</option>
@@ -363,7 +363,7 @@ export function LocalConnectClient({
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 h-9"
+                    className="w-full rounded-md border border-[#252729] bg-[#151719] px-3 py-1.5 text-xs text-[#F5F5F2] focus:outline-none focus:border-[#F5B94C] focus:ring-1 focus:ring-[#F5B94C] h-9"
                     id="filter-category"
                   >
                     <option value="all">All Categories</option>
@@ -380,7 +380,7 @@ export function LocalConnectClient({
                   <select
                     value={selectedVerification}
                     onChange={(e) => setSelectedVerification(e.target.value)}
-                    className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 h-9"
+                    className="w-full rounded-md border border-[#252729] bg-[#151719] px-3 py-1.5 text-xs text-[#F5F5F2] focus:outline-none focus:border-[#F5B94C] focus:ring-1 focus:ring-[#F5B94C] h-9"
                     id="filter-verification"
                   >
                     <option value="all">All Verification States</option>
@@ -392,9 +392,9 @@ export function LocalConnectClient({
               </div>
 
               {/* Status and Clear Filters Row */}
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-800/60 text-xs">
-                <span className="text-slate-400">
-                  Showing <strong className="text-white">{filteredContacts.length}</strong> matching local resources
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#252729] text-xs">
+                <span className="text-[#858783]">
+                  Showing <strong className="text-[#F5F5F2]">{filteredContacts.length}</strong> matching local resources
                 </span>
 
                 <div className="flex items-center gap-2">
@@ -411,7 +411,7 @@ export function LocalConnectClient({
                       variant="ghost"
                       size="sm"
                       onClick={handleClearFilters}
-                      className="text-xs text-slate-400 hover:text-white h-7 px-2"
+                      className="text-xs text-[#858783] hover:text-[#F5B94C] h-7 px-2"
                       id="clear-filters-btn"
                     >
                       <X className="h-3 w-3 mr-1" /> Clear all filters
@@ -440,13 +440,13 @@ export function LocalConnectClient({
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filteredContacts.map((contact) => {
                 const Icon = categoryIcons[contact.category] || Users
-                const colorClass = categoryColors[contact.category] || 'text-slate-400 bg-slate-800'
+                const colorClass = categoryColors[contact.category] || 'text-[#858783] bg-[#151719]'
                 const status = contact.verification_status || (contact.verified ? 'directly_confirmed' : 'unverified')
 
                 return (
                   <Card
                     key={contact.id}
-                    className="flex flex-col justify-between border-slate-800 bg-slate-900/60 transition-all hover:border-slate-700 hover:shadow-lg"
+                    className="flex flex-col justify-between border-[#252729] bg-[#101314] transition-all hover:border-[#F5B94C]/40 hover:shadow-[0_0_15px_rgba(101,240,120,0.06)]"
                   >
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between gap-2">
@@ -457,10 +457,10 @@ export function LocalConnectClient({
                             <Icon className="h-4 w-4" />
                           </div>
                           <div>
-                            <CardTitle className="text-sm font-bold text-white hover:text-indigo-300 transition-colors">
+                            <CardTitle className="text-sm font-bold text-[#F5F5F2] hover:text-[#F5B94C] transition-colors">
                               <Link href={`/local-connect/${contact.id}`}>{contact.name}</Link>
                             </CardTitle>
-                            <CardDescription className="text-xs text-slate-400 line-clamp-1">
+                            <CardDescription className="text-xs text-[#858783] line-clamp-1">
                               {contact.role ? `${contact.role} · ` : ''}
                               {contact.organization}
                             </CardDescription>
@@ -472,10 +472,10 @@ export function LocalConnectClient({
                           <div
                             className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${
                               contact.matchScore >= 70
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                ? 'bg-[#151719] text-[#F5B94C] border border-[#3A3D40]'
                                 : contact.matchScore >= 40
-                                ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                                : 'bg-slate-800 text-slate-400 border border-slate-700'
+                                ? 'bg-[#151719]/60 text-[#FFD27A] border border-[#252729]'
+                                : 'bg-[#151719] text-[#858783] border border-[#252729]'
                             }`}
                             title={`Relevance score: ${contact.matchScore}/100`}
                           >
@@ -487,7 +487,7 @@ export function LocalConnectClient({
 
                       {/* City & Category Bar */}
                       <div className="flex flex-wrap items-center gap-1.5 pt-2">
-                        <Badge variant="outline" className="text-[10px] border-slate-700">
+                        <Badge variant="outline" className="text-[10px] border-[#252729] bg-[#151719] text-[#858783]">
                           {contact.city}
                         </Badge>
                         <Badge variant="secondary" className="capitalize text-[10px]">
@@ -514,7 +514,7 @@ export function LocalConnectClient({
                     <CardContent className="space-y-3 pt-0 flex-1 flex flex-col justify-between">
                       <div className="space-y-2">
                         {contact.description && (
-                          <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-[#858783] line-clamp-2 leading-relaxed">
                             {contact.description}
                           </p>
                         )}
@@ -522,20 +522,20 @@ export function LocalConnectClient({
                         {/* Stored Capabilities */}
                         {contact.capabilities && contact.capabilities.length > 0 && (
                           <div className="space-y-1">
-                            <span className="text-[10px] uppercase font-semibold text-slate-500 tracking-wider">
+                            <span className="text-[10px] uppercase font-semibold text-[#858783] tracking-wider">
                               Capabilities:
                             </span>
                             <div className="flex flex-wrap gap-1">
                               {contact.capabilities.slice(0, 3).map((cap) => (
                                 <span
                                   key={cap}
-                                  className="rounded bg-slate-800/80 px-1.5 py-0.5 text-[10px] text-slate-300 border border-slate-700/60"
+                                  className="rounded bg-[#151719] px-1.5 py-0.5 text-[10px] text-[#F5F5F2] border border-[#252729]"
                                 >
                                   {cap}
                                 </span>
                               ))}
                               {contact.capabilities.length > 3 && (
-                                <span className="text-[10px] text-slate-500">
+                                <span className="text-[10px] text-[#858783]">
                                   +{contact.capabilities.length - 3} more
                                 </span>
                               )}
@@ -545,11 +545,11 @@ export function LocalConnectClient({
 
                         {/* Match Reasons */}
                         {contact.matchReasons.length > 0 && (
-                          <div className="rounded border border-indigo-950/80 bg-indigo-950/20 p-2 space-y-1">
-                            <span className="text-[10px] font-semibold text-indigo-400 uppercase tracking-wider">
+                          <div className="rounded border border-[#252729] bg-[#151719]/80 p-2 space-y-1">
+                            <span className="text-[10px] font-semibold text-[#F5B94C] uppercase tracking-wider">
                               Why this matches:
                             </span>
-                            <ul className="text-[11px] text-indigo-200/90 space-y-0.5 list-disc list-inside">
+                            <ul className="text-[11px] text-[#858783] space-y-0.5 list-disc list-inside">
                               {contact.matchReasons.slice(0, 2).map((reason, idx) => (
                                 <li key={idx} className="line-clamp-1">
                                   {reason}
@@ -561,14 +561,14 @@ export function LocalConnectClient({
                       </div>
 
                       {/* Footer Actions & Provenance */}
-                      <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs">
-                        <div className="text-[11px] text-slate-400 line-clamp-1 max-w-[170px]" title={contact.source_name}>
+                      <div className="pt-2 border-t border-[#252729] flex items-center justify-between text-xs">
+                        <div className="text-[11px] text-[#858783]/70 line-clamp-1 max-w-[170px]" title={contact.source_name}>
                           Src: {contact.source_name}
                         </div>
                         <Link
                           href={`/local-connect/${contact.id}`}
                           id={`connect-btn-${contact.id}`}
-                          className="inline-flex items-center gap-1 font-medium text-indigo-400 hover:text-indigo-300"
+                          className="inline-flex items-center gap-1 font-medium text-[#F5B94C] hover:text-[#FFD27A] transition-colors"
                         >
                           Connect <ChevronRight className="h-3.5 w-3.5" />
                         </Link>
@@ -586,10 +586,10 @@ export function LocalConnectClient({
       {activeTab === 'requests' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-200">
+            <h3 className="text-sm font-semibold text-[#F5F5F2]">
               Your Submitted Requests ({requests.length})
             </h3>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-[#858783]">
               Requests update when processed by local ecosystem administrators
             </span>
           </div>
@@ -613,24 +613,24 @@ export function LocalConnectClient({
                 const contact = req.contact
 
                 return (
-                  <Card key={req.id} className="border-slate-800 bg-slate-900/60 p-4 space-y-3">
+                  <Card key={req.id} className="border-[#252729] bg-[#101314] p-4 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-white">
+                          <h4 className="text-sm font-bold text-[#F5F5F2]">
                             {contact?.name || 'Local Partner Contact'}
                           </h4>
                           {contact?.role && (
-                            <span className="text-xs text-slate-400">· {contact.role}</span>
+                            <span className="text-xs text-[#858783]">· {contact.role}</span>
                           )}
                           {contact?.organization && (
-                            <span className="text-xs text-slate-500">({contact.organization})</span>
+                            <span className="text-xs text-[#858783]/70">({contact.organization})</span>
                           )}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#858783]">
                           {contact?.city && (
-                            <Badge variant="outline" className="text-[10px] border-slate-700">
+                            <Badge variant="outline" className="text-[10px] border-[#252729] bg-[#151719] text-[#858783]">
                               {contact.city}
                             </Badge>
                           )}
@@ -665,27 +665,27 @@ export function LocalConnectClient({
                     </div>
 
                     {/* Stored Context & Purpose */}
-                    <div className="grid gap-2 sm:grid-cols-2 text-xs rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                    <div className="grid gap-2 sm:grid-cols-2 text-xs rounded-lg border border-[#252729] bg-[#151719] p-3">
                       <div>
-                        <span className="font-semibold text-slate-400">Purpose:</span>
-                        <p className="text-slate-200">{req.purpose || 'Exploratory connection'}</p>
+                        <span className="font-semibold text-[#858783]">Purpose:</span>
+                        <p className="text-[#F5F5F2]">{req.purpose || 'Exploratory connection'}</p>
                       </div>
                       <div>
-                        <span className="font-semibold text-slate-400">Desired Outcome:</span>
-                        <p className="text-slate-200">{req.desired_outcome || 'Introductory review'}</p>
+                        <span className="font-semibold text-[#858783]">Desired Outcome:</span>
+                        <p className="text-[#F5F5F2]">{req.desired_outcome || 'Introductory review'}</p>
                       </div>
                       {req.business_context && (
-                        <div className="sm:col-span-2 pt-1 border-t border-slate-800/60">
-                          <span className="font-semibold text-slate-400">Business Context:</span>
-                          <p className="text-slate-300 text-[11px] leading-relaxed">
+                        <div className="sm:col-span-2 pt-1 border-t border-[#252729]">
+                          <span className="font-semibold text-[#858783]">Business Context:</span>
+                          <p className="text-[#858783] text-[11px] leading-relaxed">
                             {req.business_context}
                           </p>
                         </div>
                       )}
                       {req.message && (
-                        <div className="sm:col-span-2 pt-1 border-t border-slate-800/60">
-                          <span className="font-semibold text-slate-400">Message Body:</span>
-                          <pre className="text-slate-300 text-[11px] whitespace-pre-wrap font-sans mt-0.5">
+                        <div className="sm:col-span-2 pt-1 border-t border-[#252729]">
+                          <span className="font-semibold text-[#858783]">Message Body:</span>
+                          <pre className="text-[#F5F5F2] text-[11px] whitespace-pre-wrap font-sans mt-0.5">
                             {req.message}
                           </pre>
                         </div>

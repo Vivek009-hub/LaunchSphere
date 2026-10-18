@@ -10,7 +10,7 @@ interface PageShellProps {
 
 export function PageShell({ children, className }: PageShellProps) {
   return (
-    <main className={cn('min-h-full bg-slate-950 p-4 sm:p-6 lg:p-8', className)}>
+    <main className={cn('min-h-full bg-[#080A0B] p-4 sm:p-6 lg:p-8', className)}>
       <div className="mx-auto max-w-7xl space-y-6">{children}</div>
     </main>
   )
@@ -42,21 +42,21 @@ export function PageHeader({
     <div className={cn('flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between', className)}>
       <div className="space-y-1">
         {breadcrumbs && breadcrumbs.length > 0 && (
-          <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-1.5 text-xs text-slate-500">
+          <nav aria-label="Breadcrumb" className="mb-2 flex items-center gap-1.5 text-xs text-[#858783]">
             {breadcrumbs.map((crumb, idx) => {
               const isLast = idx === breadcrumbs.length - 1
               return (
                 <React.Fragment key={crumb.label}>
-                  {idx > 0 && <ChevronRight className="h-3 w-3 text-slate-600" aria-hidden="true" />}
+                  {idx > 0 && <ChevronRight className="h-3 w-3 text-[#3A3D40]" aria-hidden="true" />}
                   {crumb.href && !isLast ? (
                     <Link
                       href={crumb.href}
-                      className="text-slate-400 hover:text-slate-200 transition-colors"
+                      className="text-[#858783] hover:text-[#F5B94C] transition-colors"
                     >
                       {crumb.label}
                     </Link>
                   ) : (
-                    <span className={cn(isLast ? 'text-slate-200 font-medium' : 'text-slate-500')}>
+                    <span className={cn(isLast ? 'text-[#F5F5F2] font-medium' : 'text-[#858783]')}>
                       {crumb.label}
                     </span>
                   )}
@@ -67,11 +67,11 @@ export function PageHeader({
         )}
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">{title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[#F5F5F2]">{title}</h2>
           {badge}
         </div>
         {description && (
-          <p className="text-xs sm:text-sm text-slate-400 max-w-3xl leading-relaxed">{description}</p>
+          <p className="text-xs sm:text-sm text-[#B4B5B2] max-w-3xl leading-relaxed">{description}</p>
         )}
       </div>
 

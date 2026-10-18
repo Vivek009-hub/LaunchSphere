@@ -306,53 +306,53 @@ export default function NewComparisonPage() {
       {/* Startup Profile Context Banner */}
       {!profileLoading && (
         profile ? (
-          <Card className="mb-6 border-blue-500/30 bg-blue-950/20">
+          <Card className="mb-6 border-[#252729] bg-[#101314]">
             <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#151719] text-[#F5B94C] border border-[#3A3D40]">
                   <Building2 className="h-4 w-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-blue-400">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[#F5B94C]">
                       Active Startup Profile
                     </span>
-                    <Badge variant="outline" className="border-blue-500/40 text-blue-300 text-[10px] uppercase">
+                    <Badge variant="outline" className="border-[#3A3D40] text-[#F5B94C] text-[10px] uppercase font-mono">
                       {profile.stage}
                     </Badge>
                   </div>
-                  <h4 className="text-sm font-semibold text-white mt-0.5">
-                    {profile.name} <span className="font-normal text-slate-400">({profile.industry})</span>
+                  <h4 className="text-sm font-semibold text-[#F5F5F2] mt-0.5">
+                    {profile.name} <span className="font-normal text-[#858783]">({profile.industry})</span>
                   </h4>
-                  <p className="text-xs text-slate-300 mt-0.5">
-                    Target: <span className="text-slate-200">{profile.target_customer}</span> • Channel: <span className="text-slate-200">{profile.primary_channel || 'Direct'}</span>
+                  <p className="text-xs text-[#B4B5B2] mt-0.5">
+                    Target: <span className="text-[#F5F5F2]">{profile.target_customer}</span> • Channel: <span className="text-[#F5F5F2]">{profile.primary_channel || 'Direct'}</span>
                     {profile.price_min && (
-                      <> • Price: <span className="text-slate-200">₹{profile.price_min.toLocaleString('en-IN')}{profile.price_max ? `–₹${profile.price_max.toLocaleString('en-IN')}` : ''}</span></>
+                      <> • Price: <span className="text-[#F5F5F2]">₹{profile.price_min.toLocaleString('en-IN')}{profile.price_max ? `–₹${profile.price_max.toLocaleString('en-IN')}` : ''}</span></>
                     )}
                   </p>
                 </div>
               </div>
               <Link href="/settings">
-                <Button size="sm" variant="outline" className="shrink-0 border-blue-500/30 text-blue-200 hover:text-white text-xs">
+                <Button size="sm" variant="outline" className="shrink-0 border-[#252729] text-[#B4B5B2] hover:text-[#F5F5F2] hover:bg-[#151719] text-xs">
                   Change Profile
                 </Button>
               </Link>
             </CardContent>
           </Card>
         ) : (
-          <Card className="mb-6 border-amber-500/40 bg-amber-950/20">
+          <Card className="mb-6 border-amber-500/30 bg-amber-950/20">
             <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <AlertCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="text-sm font-semibold text-white">No Startup Profile Configured</h4>
-                  <p className="text-xs text-slate-300 mt-0.5">
+                  <h4 className="text-sm font-semibold text-[#F5F5F2]">No Startup Profile Configured</h4>
+                  <p className="text-xs text-[#B4B5B2] mt-0.5">
                     Complete onboarding to customize Fit Score weights according to your product category, pricing model, and distribution channels.
                   </p>
                 </div>
               </div>
               <Link href="/onboarding">
-                <Button size="sm" className="shrink-0 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold text-xs">
+                <Button size="sm" className="shrink-0 bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold text-xs">
                   Complete Onboarding
                 </Button>
               </Link>
@@ -370,15 +370,15 @@ export default function NewComparisonPage() {
 
       <form onSubmit={handleCreate} className="space-y-8">
         {/* Step 1: Comparison Title */}
-        <Card>
+        <Card className="border-[#252729] bg-[#101314]">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#151719] text-[#F5B94C] border border-[#3A3D40] text-xs font-bold font-mono">
                 1
               </span>
               Comparison Title
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs text-[#858783]">
               Give this expansion assessment a memorable title for your team and investment records.
             </CardDescription>
           </CardHeader>
@@ -398,21 +398,21 @@ export default function NewComparisonPage() {
         </Card>
 
         {/* Step 2: Choose 2 Supported Cities */}
-        <Card>
+        <Card className="border-[#252729] bg-[#101314]">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#151719] text-[#F5B94C] border border-[#3A3D40] text-xs font-bold font-mono">
                     2
                   </span>
                   Select Target Expansion Cities (Pick 2)
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs text-[#858783]">
                   Choose two supported Indian cities from the catalog to evaluate side-by-side.
                 </CardDescription>
               </div>
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-xs font-mono">
                 {selectedCities.length} selected
               </Badge>
             </div>
@@ -427,27 +427,27 @@ export default function NewComparisonPage() {
                     onClick={() => toggleCity(city.name)}
                     className={`cursor-pointer rounded-xl border p-4 transition-all ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-950/30 ring-1 ring-blue-500/40 shadow-sm'
-                        : 'border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/60'
+                        ? 'border-[#F5B94C] bg-[#151719] ring-1 ring-[#F5B94C]/40 shadow-sm shadow-[#F5B94C]/10'
+                        : 'border-[#252729] bg-[#151719] hover:border-[#3A3D40] hover:bg-[#151719]/60'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <MapPin className={`h-4 w-4 ${isSelected ? 'text-blue-400' : 'text-slate-500'}`} />
+                        <MapPin className={`h-4 w-4 ${isSelected ? 'text-[#F5B94C]' : 'text-[#858783]'}`} />
                         <div>
-                          <p className="text-sm font-semibold text-white">{city.name}</p>
-                          <p className="text-xs text-slate-400">{city.state}</p>
+                          <p className="text-sm font-semibold text-[#F5F5F2]">{city.name}</p>
+                          <p className="text-xs text-[#858783]">{city.state}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Badge variant="outline" className="text-[10px] text-slate-400 border-slate-700">
+                        <Badge variant="outline" className="text-[10px] text-[#858783] border-[#252729]">
                           {city.tier}
                         </Badge>
                         <div
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
                             isSelected
-                              ? 'border-blue-500 bg-blue-600 text-white'
-                              : 'border-slate-700 bg-transparent text-transparent'
+                              ? 'border-[#F5B94C] bg-[#F5B94C] text-[#080A0B]'
+                              : 'border-[#252729] bg-transparent text-transparent'
                           }`}
                         >
                           <Check className="h-3 w-3" />
@@ -462,17 +462,17 @@ export default function NewComparisonPage() {
         </Card>
 
         {/* Step 3: Fit Score Weight Configuration */}
-        <Card>
+        <Card className="border-[#252729] bg-[#101314]">
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#151719] text-[#F5B94C] border border-[#3A3D40] text-xs font-bold font-mono">
                     3
                   </span>
                   Transparent Fit Score Weight Configuration
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs text-[#858783]">
                   Weights determine the relative importance of each dimension in the deterministic 0–100 Fit Score formula.
                 </CardDescription>
               </div>
@@ -488,7 +488,7 @@ export default function NewComparisonPage() {
                   size="sm"
                   variant="ghost"
                   onClick={resetWeights}
-                  className="text-xs text-slate-400 hover:text-white"
+                  className="text-xs text-[#858783] hover:text-[#F5F5F2]"
                 >
                   Reset Defaults
                 </Button>
@@ -496,25 +496,25 @@ export default function NewComparisonPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-xs text-slate-400 flex items-start gap-2">
-              <Info className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
+            <div className="rounded-lg border border-[#252729] bg-[#080A0B] p-3 text-xs text-[#858783] flex items-start gap-2">
+              <Info className="h-4 w-4 text-[#F5B94C] shrink-0 mt-0.5" />
               <span>
-                <strong>Deterministic Calculation:</strong> Scores are calculated strictly from verifiable market indicators and active profile parameters. Missing indicators are excluded from the weight denominator rather than silently assumed zero.
+                <strong className="text-[#F5F5F2]">Deterministic Calculation:</strong> Scores are calculated strictly from verifiable market indicators and active profile parameters. Missing indicators are excluded from the weight denominator rather than silently assumed zero.
               </span>
             </div>
 
             <div className="space-y-4 pt-2">
               {criteria.map((c, idx) => (
-                <div key={c.name} className="rounded-lg border border-slate-800 bg-slate-900/40 p-4 space-y-2">
+                <div key={c.name} className="rounded-lg border border-[#252729] bg-[#151719] p-4 space-y-2">
                   <div className="flex items-center justify-between gap-4">
                     <div className="space-y-0.5">
-                      <Label className="text-sm font-semibold text-white flex items-center gap-2">
+                      <Label className="text-sm font-semibold text-[#F5F5F2] flex items-center gap-2">
                         {c.name}
-                        <span className="text-xs font-normal text-slate-400">
+                        <span className="text-xs font-normal text-[#858783] font-mono">
                           ({c.weight}%)
                         </span>
                       </Label>
-                      <p className="text-xs text-slate-400 leading-relaxed max-w-xl">
+                      <p className="text-xs text-[#858783] leading-relaxed max-w-xl">
                         {c.description}
                       </p>
                     </div>
@@ -525,14 +525,14 @@ export default function NewComparisonPage() {
                         max="100"
                         value={c.weight}
                         onChange={(e) => handleWeightChange(idx, parseInt(e.target.value) || 0)}
-                        className="w-20 text-center font-mono text-sm"
+                        className="w-20 text-center font-mono text-sm bg-[#101314] border-[#252729]"
                       />
-                      <span className="text-xs text-slate-500 font-mono">%</span>
+                      <span className="text-xs text-[#858783] font-mono">%</span>
                     </div>
                   </div>
-                  <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-[#080A0B] border border-[#252729] h-1.5 rounded-full overflow-hidden">
                     <div
-                      className="bg-blue-500 h-full rounded-full transition-all"
+                      className="bg-[#F5B94C] h-full rounded-full transition-all"
                       style={{ width: `${Math.min(100, (c.weight / (totalWeight || 100)) * 100)}%` }}
                     />
                   </div>
@@ -545,19 +545,19 @@ export default function NewComparisonPage() {
         {/* Submit Action */}
         <div className="flex items-center justify-end gap-3 pt-4">
           <Link href="/city-intelligence">
-            <Button type="button" variant="ghost" disabled={loading}>
+            <Button type="button" variant="ghost" disabled={loading} className="text-[#858783] hover:text-[#F5F5F2]">
               Cancel
             </Button>
           </Link>
           <Button
             type="submit"
             disabled={loading || selectedCities.length < 2}
-            className="gap-2 bg-blue-600 hover:bg-blue-500 text-white min-w-[200px]"
+            className="gap-2 bg-[#F5B94C] text-[#080A0B] hover:bg-[#FFD27A] font-semibold min-w-[200px]"
             id="btn-run-comparison"
           >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#080A0B]" />
                 Calculating Deterministic Fit...
               </>
             ) : (

@@ -16,7 +16,7 @@ export function DashboardShell({
   children,
   user,
   isDemo = true,
-  startupName = 'Kavach AgriTech',
+  startupName = "Shaurya's Startup",
 }: DashboardShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -44,8 +44,8 @@ export function DashboardShell({
   }, [mobileMenuOpen])
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950 font-sans text-slate-200">
-      {/* Desktop Sidebar (hidden on mobile, visible from md up) */}
+    <div className="flex h-screen overflow-hidden bg-[#080A0B] font-sans text-[#F5F5F2]">
+      {/* Desktop Sidebar */}
       <div className="hidden md:flex md:flex-shrink-0">
         <Sidebar />
       </div>
@@ -60,27 +60,27 @@ export function DashboardShell({
         >
           {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-[#080A0B]/80 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
           {/* Off-canvas menu panel */}
-          <div className="relative flex w-72 max-w-[85vw] flex-col bg-slate-950 shadow-2xl transition-transform animate-in slide-in-from-left duration-200">
+          <div className="relative flex w-72 max-w-[85vw] flex-col bg-[#090B0C] border-r border-[#252729] shadow-2xl transition-transform animate-in slide-in-from-left duration-200">
             <Sidebar isMobile onCloseMobile={() => setMobileMenuOpen(false)} />
           </div>
         </div>
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0 bg-[#080A0B]">
         <Topbar
           user={user}
           onOpenMobileMenu={() => setMobileMenuOpen(true)}
           isDemo={isDemo}
           startupName={startupName}
         />
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-[#080A0B]">
           {children}
         </div>
       </div>

@@ -258,13 +258,13 @@ export function MarketValidationClient({
               variant="outline"
               size="sm"
               onClick={() => setIsModalOpen(true)}
-              className="border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200"
+              className="border-[#252729] bg-[#101314] hover:bg-[#151719] hover:border-[#F5B94C]/50 text-[#F5F5F2]"
             >
-              <Plus className="mr-1.5 h-4 w-4 text-emerald-400" />
+              <Plus className="mr-1.5 h-4 w-4 text-[#F5B94C]" />
               New Hypothesis
             </Button>
             <Link href="/market-validation/new">
-              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/40">
+              <Button size="sm" className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold shadow-lg shadow-[#F5B94C]/20">
                 <FlaskConical className="mr-1.5 h-4 w-4" />
                 New Experiment
               </Button>
@@ -275,9 +275,9 @@ export function MarketValidationClient({
 
       {/* Tabs and Filters */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#252729] pb-3">
           {/* Navigation Tabs */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-900/90 rounded-xl border border-slate-800 max-w-fit">
+          <div className="flex items-center gap-1.5 p-1 bg-[#101314] rounded-xl border border-[#252729] max-w-fit">
             <button
               type="button"
               onClick={() => {
@@ -286,13 +286,13 @@ export function MarketValidationClient({
               }}
               className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'experiments'
-                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  ? 'bg-[#151719] text-[#F5B94C] border border-[#3A3D40] shadow-sm'
+                  : 'text-[#858783] hover:text-[#F5F5F2] hover:bg-[#151719]'
               }`}
             >
               <FlaskConical className="h-3.5 w-3.5" />
               <span>Experiments</span>
-              <span className="ml-1 rounded-full bg-slate-800 px-1.5 py-0.2 text-[10px] text-slate-300">
+              <span className="ml-1 rounded-full bg-[#151719] px-1.5 py-0.2 text-[10px] text-[#858783] border border-[#252729]">
                 {experiments.length}
               </span>
             </button>
@@ -305,13 +305,13 @@ export function MarketValidationClient({
               }}
               className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 activeTab === 'hypotheses'
-                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  ? 'bg-[#151719] text-[#F5B94C] border border-[#3A3D40] shadow-sm'
+                  : 'text-[#858783] hover:text-[#F5F5F2] hover:bg-[#151719]'
               }`}
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span>Market Hypotheses</span>
-              <span className="ml-1 rounded-full bg-slate-800 px-1.5 py-0.2 text-[10px] text-slate-300">
+              <span className="ml-1 rounded-full bg-[#151719] px-1.5 py-0.2 text-[10px] text-[#858783] border border-[#252729]">
                 {hypotheses.length}
               </span>
             </button>
@@ -320,11 +320,11 @@ export function MarketValidationClient({
           {/* City & Status Filters */}
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">City:</span>
+              <span className="text-xs text-[#858783]">City:</span>
               <Select
                 value={cityFilter}
                 onChange={(e) => setCityFilter(e.target.value)}
-                className="h-8 w-36 text-xs bg-slate-900 border-slate-800 text-slate-200"
+                className="h-8 w-36 text-xs bg-[#151719] border-[#252729] text-[#F5F5F2]"
               >
                 <option value="All">All Cities</option>
                 {allCities.map((c) => (
@@ -336,11 +336,11 @@ export function MarketValidationClient({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">Status:</span>
+              <span className="text-xs text-[#858783]">Status:</span>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="h-8 w-36 text-xs bg-slate-900 border-slate-800 text-slate-200"
+                className="h-8 w-36 text-xs bg-[#151719] border-[#252729] text-[#F5F5F2]"
               >
                 <option value="All">All Statuses</option>
                 {activeTab === 'experiments' ? (
@@ -374,7 +374,7 @@ export function MarketValidationClient({
                 description="Create a structured field experiment with defined success thresholds to test willingness-to-pay and procurement hurdles."
                 action={
                   <Link href="/market-validation/new">
-                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-500">
+                    <Button size="sm" className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold">
                       Create First Experiment
                     </Button>
                   </Link>
@@ -392,7 +392,7 @@ export function MarketValidationClient({
                   return (
                     <Card
                       key={exp.id}
-                      className="group relative border-slate-800 bg-slate-900/60 transition-all duration-200 hover:border-slate-700 hover:bg-slate-900/90"
+                      className="group relative border-[#252729] bg-[#101314] transition-all duration-200 hover:border-[#F5B94C]/40 hover:shadow-[0_0_15px_rgba(101,240,120,0.06)]"
                     >
                       <CardContent className="p-5">
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -404,12 +404,12 @@ export function MarketValidationClient({
                                 <span>{cfg.label}</span>
                               </Badge>
 
-                              <Badge variant="outline" className="text-[11px] border-slate-700 text-slate-300">
-                                <MapPin className="mr-1 h-3 w-3 text-slate-400" />
+                              <Badge variant="outline" className="text-[11px] border-[#252729] bg-[#151719] text-[#858783]">
+                                <MapPin className="mr-1 h-3 w-3 text-[#F5B94C]" />
                                 {exp.city}
                               </Badge>
 
-                              <Badge variant="secondary" className="text-[11px] bg-slate-800 text-slate-300">
+                              <Badge variant="secondary" className="text-[11px] bg-[#151719] text-[#858783] border border-[#252729]">
                                 {methodLabels[exp.method] || exp.method}
                               </Badge>
 
@@ -419,23 +419,23 @@ export function MarketValidationClient({
                             </div>
 
                             <Link href={`/market-validation/${exp.id}`}>
-                              <h3 className="text-base font-semibold text-slate-100 group-hover:text-emerald-300 transition-colors cursor-pointer mt-1">
+                              <h3 className="text-base font-semibold text-[#F5F5F2] group-hover:text-[#F5B94C] transition-colors cursor-pointer mt-1">
                                 {exp.title}
                               </h3>
                             </Link>
 
-                            <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/80">
-                              <span className="font-semibold text-slate-400">Hypothesis: </span>
+                            <p className="text-xs text-[#858783] leading-relaxed bg-[#151719] p-2.5 rounded-lg border border-[#252729]">
+                              <span className="font-semibold text-[#F5F5F2]">Hypothesis: </span>
                               {exp.hypothesis}
                             </p>
 
                             {/* Structured Threshold Criteria Box */}
-                            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">
+                            <div className="flex flex-wrap items-center gap-4 text-xs text-[#858783] pt-1">
                               <div className="flex items-center gap-1.5">
-                                <Target className="h-3.5 w-3.5 text-emerald-400" />
+                                <Target className="h-3.5 w-3.5 text-[#F5B94C]" />
                                 <span>
                                   Success Threshold:{' '}
-                                  <strong className="text-slate-200 font-medium">
+                                  <strong className="text-[#F5F5F2] font-medium">
                                     {exp.success_threshold}
                                   </strong>
                                 </span>
@@ -443,10 +443,10 @@ export function MarketValidationClient({
 
                               {exp.sample_size_target && (
                                 <div className="flex items-center gap-1.5">
-                                  <Users className="h-3.5 w-3.5 text-indigo-400" />
+                                  <Users className="h-3.5 w-3.5 text-[#F5B94C]" />
                                   <span>
                                     Target Sample:{' '}
-                                    <strong className="text-slate-200 font-medium">
+                                    <strong className="text-[#F5F5F2] font-medium">
                                       {exp.sample_size_target} interviews / responses
                                     </strong>
                                   </span>
@@ -456,8 +456,8 @@ export function MarketValidationClient({
                           </div>
 
                           {/* Right Column: Actions & Timestamps */}
-                          <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-3 border-t md:border-t-0 border-slate-800 pt-3 md:pt-0">
-                            <span className="text-[11px] text-slate-500 whitespace-nowrap">
+                          <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-3 border-t md:border-t-0 border-[#252729] pt-3 md:pt-0">
+                            <span className="text-[11px] text-[#858783] whitespace-nowrap">
                               Updated {formatDate(exp.updated_at || exp.created_at)}
                             </span>
 
@@ -465,7 +465,7 @@ export function MarketValidationClient({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="border-slate-700 bg-slate-800/60 hover:bg-emerald-600 hover:border-emerald-500 hover:text-white text-xs group-hover:border-slate-600"
+                                className="border-[#252729] bg-[#151719] hover:bg-[#151719] hover:border-[#F5B94C]/50 hover:text-[#F5B94C] text-[#F5F5F2] text-xs"
                               >
                                 View Details & Data
                                 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
@@ -491,7 +491,7 @@ export function MarketValidationClient({
                 title="No market hypotheses found"
                 description="Formulate clear, falsifiable assumptions about target customer willingness to pay and behavior before running expensive trials."
                 action={
-                  <Button size="sm" onClick={() => setIsModalOpen(true)} className="bg-emerald-600 hover:bg-emerald-500">
+                  <Button size="sm" onClick={() => setIsModalOpen(true)} className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold">
                     Create First Hypothesis
                   </Button>
                 }
@@ -505,7 +505,7 @@ export function MarketValidationClient({
                   return (
                     <Card
                       key={hyp.id}
-                      className="border-slate-800 bg-slate-900/60 transition-all duration-200 hover:border-slate-700"
+                      className="border-[#252729] bg-[#101314] transition-all duration-200 hover:border-[#F5B94C]/40 hover:shadow-[0_0_15px_rgba(101,240,120,0.06)]"
                     >
                       <CardContent className="p-5 space-y-4">
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -515,28 +515,28 @@ export function MarketValidationClient({
                                 <StatusIcon className="mr-1 h-3.5 w-3.5" />
                                 {cfg.label}
                               </Badge>
-                              <Badge variant="outline" className="text-xs border-slate-700 text-slate-300">
-                                <MapPin className="mr-1 h-3 w-3 text-slate-400" />
+                              <Badge variant="outline" className="text-xs border-[#252729] bg-[#151719] text-[#858783]">
+                                <MapPin className="mr-1 h-3 w-3 text-[#F5B94C]" />
                                 {hyp.city}
                               </Badge>
-                              <Badge variant="secondary" className="text-xs bg-slate-800 text-slate-300">
-                                <Users className="mr-1 h-3 w-3 text-slate-400" />
+                              <Badge variant="secondary" className="text-xs bg-[#151719] text-[#858783] border border-[#252729]">
+                                <Users className="mr-1 h-3 w-3 text-[#F5B94C]" />
                                 {hyp.target_audience}
                               </Badge>
                             </div>
 
-                            <h3 className="text-base font-semibold text-slate-100 leading-snug pt-1">
+                            <h3 className="text-base font-semibold text-[#F5F5F2] leading-snug pt-1">
                               {hyp.statement}
                             </h3>
                           </div>
 
                           {/* Quick Lifecycle Status Switcher */}
                           <div className="flex items-center gap-2 self-start">
-                            <span className="text-[11px] text-slate-500 whitespace-nowrap">Status:</span>
+                            <span className="text-[11px] text-[#858783] whitespace-nowrap">Status:</span>
                             <Select
                               value={hyp.status}
                               onChange={(e) => handleStatusChange(hyp.id, e.target.value as HypothesisStatus)}
-                              className="h-8 w-32 text-xs bg-slate-950 border-slate-800 text-slate-300"
+                              className="h-8 w-32 text-xs bg-[#151719] border-[#252729] text-[#F5F5F2]"
                             >
                               <option value="untested">Untested</option>
                               <option value="testing">Testing Active</option>
@@ -549,32 +549,32 @@ export function MarketValidationClient({
 
                         {/* Problem & Expected Behavior breakdown */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                          <div className="rounded-lg border border-slate-800/90 bg-slate-950/40 p-3">
-                            <span className="font-semibold text-rose-400/90 flex items-center gap-1.5 mb-1">
+                          <div className="rounded-lg border border-[#252729] bg-[#151719] p-3">
+                            <span className="font-semibold text-rose-400 flex items-center gap-1.5 mb-1">
                               <AlertTriangle className="h-3.5 w-3.5" />
                               Problem / Unmet Need
                             </span>
-                            <p className="text-slate-300 leading-relaxed">{hyp.problem_statement}</p>
+                            <p className="text-[#858783] leading-relaxed">{hyp.problem_statement}</p>
                           </div>
 
-                          <div className="rounded-lg border border-slate-800/90 bg-slate-950/40 p-3">
-                            <span className="font-semibold text-emerald-400/90 flex items-center gap-1.5 mb-1">
+                          <div className="rounded-lg border border-[#252729] bg-[#151719] p-3">
+                            <span className="font-semibold text-[#F5B94C] flex items-center gap-1.5 mb-1">
                               <CheckCircle2 className="h-3.5 w-3.5" />
                               Expected Customer Behavior
                             </span>
-                            <p className="text-slate-300 leading-relaxed">{hyp.expected_behavior}</p>
+                            <p className="text-[#858783] leading-relaxed">{hyp.expected_behavior}</p>
                           </div>
                         </div>
 
                         {hyp.strategic_rationale && (
-                          <p className="text-xs text-slate-400 italic">
-                            <span className="font-medium text-slate-500">Rationale: </span>
+                          <p className="text-xs text-[#858783] italic">
+                            <span className="font-medium text-[#858783]/70">Rationale: </span>
                             {hyp.strategic_rationale}
                           </p>
                         )}
 
-                        <div className="flex items-center justify-between border-t border-slate-800/80 pt-3">
-                          <span className="text-[11px] text-slate-500">
+                        <div className="flex items-center justify-between border-t border-[#252729] pt-3">
+                          <span className="text-[11px] text-[#858783]">
                             Created {formatDate(hyp.created_at)}
                           </span>
 
@@ -586,7 +586,7 @@ export function MarketValidationClient({
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/30"
+                              className="text-xs text-[#F5B94C] hover:text-[#FFD27A] hover:bg-[#151719]"
                             >
                               Launch Experiment for this Hypothesis →
                             </Button>
@@ -604,16 +604,16 @@ export function MarketValidationClient({
 
       {/* ─── MODAL: CREATE HYPOTHESIS ─── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="w-full max-w-2xl rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4 bg-slate-950/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-[#3A3D40] bg-[#101314] shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#252729] px-6 py-4 bg-[#151719]">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <div className="p-2 rounded-lg bg-[#151719] text-[#F5B94C] border border-[#3A3D40]">
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-white">New Market Hypothesis</h3>
-                  <p className="text-xs text-slate-400">
+                  <h3 className="text-base font-semibold text-[#F5F5F2]">New Market Hypothesis</h3>
+                  <p className="text-xs text-[#858783]">
                     Define a clear, falsifiable demand assumption before spending budget on field trials.
                   </p>
                 </div>
@@ -621,7 +621,7 @@ export function MarketValidationClient({
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-200 p-1 rounded-lg hover:bg-slate-800"
+                className="text-[#858783] hover:text-[#F5F5F2] p-1 rounded-lg hover:bg-[#151719]"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -637,14 +637,14 @@ export function MarketValidationClient({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="hyp-city" className="text-xs text-slate-300 font-medium">
+                  <Label htmlFor="hyp-city" className="text-xs text-[#F5F5F2] font-medium">
                     Target City *
                   </Label>
                   <Select
                     id="hyp-city"
                     value={hypForm.city}
                     onChange={(e) => setHypForm({ ...hypForm, city: e.target.value })}
-                    className="bg-slate-950 border-slate-700 text-sm"
+                    className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                   >
                     {allCities.map((city) => (
                       <option key={city} value={city}>
@@ -655,7 +655,7 @@ export function MarketValidationClient({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="hyp-audience" className="text-xs text-slate-300 font-medium">
+                  <Label htmlFor="hyp-audience" className="text-xs text-[#F5F5F2] font-medium">
                     Target Customer Segment / Audience *
                   </Label>
                   <Input
@@ -663,14 +663,14 @@ export function MarketValidationClient({
                     placeholder="e.g. FPO Directors, Supermarket Category Heads"
                     value={hypForm.target_audience}
                     onChange={(e) => setHypForm({ ...hypForm, target_audience: e.target.value })}
-                    className="bg-slate-950 border-slate-700 text-sm"
+                    className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="hyp-statement" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="hyp-statement" className="text-xs text-[#F5F5F2] font-medium">
                   Hypothesis Statement *
                 </Label>
                 <Textarea
@@ -679,17 +679,17 @@ export function MarketValidationClient({
                   placeholder="e.g. FPO directors in Pune will commit ₹450/month per storage pod for mobile temperature telemetry."
                   value={hypForm.statement}
                   onChange={(e) => setHypForm({ ...hypForm, statement: e.target.value })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                   required
                 />
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-[#858783]">
                   State the assumption clearly so it can be proven true or false with field data.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="hyp-problem" className="text-xs text-slate-300 font-medium">
+                  <Label htmlFor="hyp-problem" className="text-xs text-[#F5F5F2] font-medium">
                     Problem / Pain Point *
                   </Label>
                   <Textarea
@@ -698,13 +698,13 @@ export function MarketValidationClient({
                     placeholder="Describe the current loss, expense, or operational friction the customer experiences..."
                     value={hypForm.problem_statement}
                     onChange={(e) => setHypForm({ ...hypForm, problem_statement: e.target.value })}
-                    className="bg-slate-950 border-slate-700 text-sm"
+                    className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="hyp-behavior" className="text-xs text-slate-300 font-medium">
+                  <Label htmlFor="hyp-behavior" className="text-xs text-[#F5F5F2] font-medium">
                     Expected Behavior *
                   </Label>
                   <Textarea
@@ -713,14 +713,14 @@ export function MarketValidationClient({
                     placeholder="What specific action will prove they need and will pay for your solution? (e.g. sign paid pilot, prepay subscription)..."
                     value={hypForm.expected_behavior}
                     onChange={(e) => setHypForm({ ...hypForm, expected_behavior: e.target.value })}
-                    className="bg-slate-950 border-slate-700 text-sm"
+                    className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="hyp-rationale" className="text-xs text-slate-300 font-medium">
+                <Label htmlFor="hyp-rationale" className="text-xs text-[#F5F5F2] font-medium">
                   Strategic Rationale (Optional)
                 </Label>
                 <Input
@@ -728,18 +728,18 @@ export function MarketValidationClient({
                   placeholder="Why is proving this hypothesis critical to your city expansion roadmap?"
                   value={hypForm.strategic_rationale}
                   onChange={(e) => setHypForm({ ...hypForm, strategic_rationale: e.target.value })}
-                  className="bg-slate-950 border-slate-700 text-sm"
+                  className="bg-[#151719] border-[#252729] text-[#F5F5F2] text-sm focus:border-[#F5B94C]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-3 border-t border-slate-800 pt-4 mt-2">
+              <div className="flex items-center justify-end gap-3 border-t border-[#252729] pt-4 mt-2">
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsModalOpen(false)}
                   disabled={modalLoading}
-                  className="text-slate-400 hover:text-slate-200"
+                  className="text-[#858783] hover:text-[#F5F5F2]"
                 >
                   Cancel
                 </Button>
@@ -747,7 +747,7 @@ export function MarketValidationClient({
                   type="submit"
                   size="sm"
                   disabled={modalLoading}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white min-w-[140px]"
+                  className="bg-[#F5B94C] hover:bg-[#FFD27A] text-[#080A0B] font-semibold min-w-[140px] shadow-lg shadow-[#F5B94C]/20"
                 >
                   {modalLoading ? (
                     <>

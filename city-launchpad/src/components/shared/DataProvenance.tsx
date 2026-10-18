@@ -41,7 +41,7 @@ export function DataProvenance({
   const ConfIcon = conf.icon
 
   return (
-    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-slate-400">
+    <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#858783]">
       {(isDemo || isSimulated) && (
         <Badge variant="demo" className="text-[10px] uppercase font-mono">
           Simulated Benchmark
@@ -49,13 +49,13 @@ export function DataProvenance({
       )}
 
       {geographicScope && (
-        <Badge variant="outline" className="text-[10px] uppercase font-mono border-slate-700 text-slate-400">
+        <Badge variant="outline" className="text-[10px] uppercase font-mono border-[#252729] text-[#858783]">
           Scope: {geographicScope}
         </Badge>
       )}
 
       {dataPeriod && (
-        <Badge variant="outline" className="text-[10px] font-mono border-slate-700 text-slate-400">
+        <Badge variant="outline" className="text-[10px] font-mono border-[#252729] text-[#858783]">
           {dataPeriod}
         </Badge>
       )}
@@ -72,13 +72,13 @@ export function DataProvenance({
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 hover:underline"
+            className="inline-flex items-center gap-1 text-[#F5B94C] hover:text-[#FFD27A] hover:underline"
           >
             {sourceName}
             <ExternalLink className="h-2.5 w-2.5" />
           </a>
         ) : (
-          <span className="text-slate-400">{sourceName}</span>
+          <span className="text-[#B4B5B2]">{sourceName}</span>
         )}
       </span>
 
@@ -89,7 +89,7 @@ export function DataProvenance({
         </span>
       )}
 
-      {notes && <span className="italic text-slate-600">· {notes}</span>}
+      {notes && <span className="italic text-[#858783]">· {notes}</span>}
     </div>
   )
 }

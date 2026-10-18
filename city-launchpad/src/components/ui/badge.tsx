@@ -3,18 +3,19 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#F5B94C]',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-indigo-600/20 text-indigo-300',
-        secondary: 'border-transparent bg-slate-700 text-slate-300',
-        success: 'border-transparent bg-emerald-600/20 text-emerald-300',
-        warning: 'border-transparent bg-amber-600/20 text-amber-300',
-        destructive: 'border-transparent bg-rose-600/20 text-rose-300',
-        outline: 'border-slate-700 text-slate-400',
-        demo: 'border-amber-600/50 bg-amber-600/10 text-amber-400',
-        unverified: 'border-slate-600 bg-slate-800 text-slate-500',
+        default: 'border-[#9A6B22]/40 bg-[#F5B94C]/10 text-[#FFD27A]',
+        gold: 'border-[#F5B94C]/40 bg-[#F5B94C]/15 text-[#F5B94C] font-semibold',
+        secondary: 'border-[#252729] bg-[#151719] text-[#B4B5B2]',
+        success: 'border-emerald-500/30 bg-emerald-950/40 text-emerald-300',
+        warning: 'border-[#9A6B22]/40 bg-[#9A6B22]/20 text-[#FFD27A]',
+        destructive: 'border-rose-500/30 bg-rose-950/40 text-rose-300',
+        outline: 'border-[#252729] text-[#858783]',
+        demo: 'border-[#F5B94C]/30 bg-[#F5B94C]/10 text-[#FFD27A] font-mono text-[10px]',
+        unverified: 'border-[#252729] bg-[#151719] text-[#858783]',
       },
     },
     defaultVariants: {

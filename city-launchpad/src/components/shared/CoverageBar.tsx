@@ -23,13 +23,13 @@ export function CoverageBar({
   const isHigh = clamped >= 80
   const isMedium = clamped >= 60 && clamped < 80
   const barColor = isHigh
-    ? 'bg-blue-500'
+    ? 'bg-[#F5B94C]'
     : isMedium
-      ? 'bg-cyan-500'
-      : 'bg-amber-500'
+      ? 'bg-[#9A6B22]'
+      : 'bg-amber-600'
 
   const statusLabel = isHigh
-    ? 'High coverage'
+    ? 'High verification'
     : isMedium
       ? 'Moderate coverage'
       : 'Sparse evidence'
@@ -44,24 +44,24 @@ export function CoverageBar({
       className={cn('flex flex-col gap-1.5', className)}
     >
       <div className="flex items-center justify-between text-xs">
-        <span className="flex items-center gap-1.5 font-medium text-slate-400">
+        <span className="flex items-center gap-1.5 font-medium text-[#858783]">
           {isHigh ? (
-            <ShieldCheck className="h-3.5 w-3.5 text-blue-400" />
+            <ShieldCheck className="h-3.5 w-3.5 text-[#F5B94C]" />
           ) : (
-            <ShieldAlert className="h-3.5 w-3.5 text-amber-400" />
+            <ShieldAlert className="h-3.5 w-3.5 text-[#F5B94C]" />
           )}
           {label}
         </span>
         {showPercentage && (
-          <span className="font-semibold text-slate-300">
-            {clamped}% <span className="text-[10px] text-slate-500 font-normal">({statusLabel})</span>
+          <span className="font-semibold text-[#F5F5F2] font-mono text-xs">
+            {clamped}% <span className="text-[10px] text-[#858783] font-normal">({statusLabel})</span>
           </span>
         )}
       </div>
 
       <div
         className={cn(
-          'w-full overflow-hidden rounded-full bg-slate-800',
+          'w-full overflow-hidden rounded-full bg-[#151719] border border-[#252729]',
           size === 'sm' ? 'h-1.5' : 'h-2'
         )}
       >

@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   MapPin,
   Users,
@@ -9,697 +10,717 @@ import {
   ShieldCheck,
   Building2,
   ArrowRight,
-  Target,
+  TrendingUp,
+  BarChart3,
+  Play,
+  CheckCircle2,
+  Edit,
   Clock,
-  Eye,
+  Sparkles,
+  ExternalLink,
+  Target,
 } from 'lucide-react'
-import { PageShell, PageHeader } from '@/components/layout/PageShell'
+import { PageShell } from '@/components/layout/PageShell'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { StatCard } from '@/components/shared/StatCard'
-import { ScoreGauge } from '@/components/shared/ScoreGauge'
-import { CoverageBar } from '@/components/shared/CoverageBar'
-import { EmptyState } from '@/components/shared/EmptyState'
-import { DemoBanner } from '@/components/shared/DemoBanner'
-import {
-  DEMO_PROFILE,
-  DEMO_CITY_ASSESSMENTS,
-  DEMO_INTRO_REQUESTS,
-  DEMO_EXPERIMENTS,
-  DEMO_ASSUMPTIONS,
-} from '@/lib/data/demoData'
-import { formatDate } from '@/lib/utils'
+import { MarketOpportunityMap } from '@/components/dashboard/MarketOpportunityMap'
+import { ValidationProgressGauge } from '@/components/dashboard/ValidationProgressGauge'
+import { DEMO_PROFILE } from '@/lib/data/demoData'
 
 export default function DashboardPage() {
-  // State for toggling between demo data and empty state preview (requested in spec)
-  const [showEmptyState, setShowEmptyState] = useState(false)
-
   const profile = DEMO_PROFILE
-  const cityAssessments = DEMO_CITY_ASSESSMENTS
-  const introRequests = DEMO_INTRO_REQUESTS
-  const experiments = DEMO_EXPERIMENTS
-  const assumptions = DEMO_ASSUMPTIONS
-
-  // Stage mapping
-  const stageLabels: Record<string, string> = {
-    idea: 'Idea Stage',
-    'pre-seed': 'Pre-Seed',
-    seed: 'Seed Stage',
-    'series-a': 'Series A',
-  }
-
-  // Count stats
-  const supportedAssumptions = assumptions.filter((a) => a.status === 'supported').length
-  const challengedAssumptions = assumptions.filter((a) => a.status === 'challenged').length
-  const untestedAssumptions = assumptions.filter((a) => a.status === 'untested').length
 
   return (
-    <PageShell>
-      {/* Page Header with State Toggle */}
-      <PageHeader
-        title="Founder Dashboard"
-        description="Market-entry command center: evaluate target cities, build ecosystem relationships, and validate real-world customer demand."
-        badge={
-          <Badge variant="demo" className="text-xs">
-            {showEmptyState ? 'Empty State Preview' : 'Interactive Prototype'}
-          </Badge>
-        }
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowEmptyState(!showEmptyState)}
-              className="text-xs border-slate-700 hover:border-slate-600 text-slate-300"
-              id="btn-toggle-demo-empty"
-              aria-label="Toggle between demo scenario and empty states"
-            >
-              <Eye className="mr-1.5 h-3.5 w-3.5" />
-              {showEmptyState ? 'View Demo Data' : 'Preview Empty States'}
-            </Button>
-            <Link href="/city-intelligence">
-              <Button size="sm" id="btn-header-new-comparison">
-                <MapPin className="mr-1.5 h-3.5 w-3.5" />
-                Explore Cities
+    <PageShell className="space-y-6">
+      {/* ─────────────────────────────────────────────────────────────
+          1. TOP ROW: HERO BANNER + YOUR STARTUP SUMMARY CARD
+         ───────────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Left Column: Hero Banner */}
+        <div className="lg:col-span-8 relative overflow-hidden rounded-2xl border border-[#252729] bg-[#101314] p-7 md:p-9 shadow-xl flex flex-col justify-between min-h-[290px]">
+          {/* Background Image with Golden Dark Overlay */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/hero-city.jpg"
+              alt="Golden Metropolis Skyline"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 66vw"
+              className="object-cover object-center opacity-35 select-none sepia-[0.35] brightness-90 contrast-125"
+            />
+            {/* Dark vignette layers for crisp text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#080A0B] via-[#080A0B]/85 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#101314] via-transparent to-transparent" />
+            {/* Subtle warm golden ambient glow */}
+            <div className="absolute -left-10 -top-10 h-64 w-64 rounded-full bg-[#F5B94C]/10 blur-3xl pointer-events-none" />
+          </div>
+
+          {/* Hero Top Tag & Quote */}
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#F5B94C]">
+              EXPLORE · VALIDATE · EXPAND
+            </span>
+            <span className="text-[11px] text-[#B4B5B2] italic hidden sm:block">
+              &ldquo;Better decisions today, bigger opportunities tomorrow.&rdquo;
+            </span>
+          </div>
+
+          {/* Hero Headline & Subtitle */}
+          <div className="relative z-10 my-4 space-y-2.5 max-w-xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[#F5F5F2] leading-tight">
+              Find the right city for your{' '}
+              <span className="text-[#FFD27A] drop-shadow-[0_0_12px_rgba(245,185,76,0.3)]">
+                next big move.
+              </span>
+            </h1>
+            <p className="text-xs sm:text-sm text-[#B4B5B2] leading-relaxed max-w-lg">
+              Data-driven insights, local connections and real market validation to help your startup grow with confidence.
+            </p>
+          </div>
+
+          {/* Hero Action Buttons */}
+          <div className="relative z-10 flex flex-wrap items-center gap-3 pt-1">
+            <Link href="/city-intelligence/new">
+              <Button
+                size="default"
+                className="bg-gradient-to-r from-[#FFD27A] to-[#F5B94C] text-[#080A0B] font-bold hover:brightness-105 shadow-lg shadow-[#F5B94C]/25 text-xs px-5 h-9 rounded-xl gap-1.5"
+              >
+                <span>Analyze a City</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+
+            <Link href="/market-validation">
+              <Button
+                variant="outline"
+                size="default"
+                className="border-[#252729] bg-[#151719]/90 text-[#F5F5F2] hover:bg-[#1A1D20] hover:border-[#3A3D40] text-xs px-4 h-9 rounded-xl gap-2 backdrop-blur"
+              >
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#F5B94C]/20 text-[#F5B94C]">
+                  <Play className="h-2.5 w-2.5 fill-current ml-0.5" />
+                </div>
+                <span>Watch Demo</span>
               </Button>
             </Link>
           </div>
-        }
-      />
+        </div>
 
-      {/* Demo Status Banner */}
-      <DemoBanner
-        message="Displaying curated Indian market-entry data for Kavach AgriTech (Pune base + 3 expansion cities). All Fit Scores and metrics are labelled visual simulations."
-      />
+        {/* Right Column: Your Startup Card */}
+        <div className="lg:col-span-4 rounded-2xl border border-[#252729] bg-[#101314] p-6 shadow-xl flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#B4B5B2]">
+                Your Startup
+              </span>
+              <Link
+                href="/settings"
+                className="text-xs text-[#F5B94C] hover:text-[#FFD27A] inline-flex items-center gap-1 font-medium transition-colors"
+              >
+                <span>Edit</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
 
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION A: STARTUP OVERVIEW
-         ───────────────────────────────────────────────────────────── */}
-      {showEmptyState ? (
-        <Card className="border-dashed border-slate-800 bg-slate-900/40">
-          <CardContent className="p-8">
-            <EmptyState
-              icon={Building2}
-              title="No startup profile configured"
-              description="Complete your onboarding profile to calibrate Fit Scores and industry benchmarks for your product."
-              action={
-                <Link href="/settings">
-                  <Button size="sm" id="btn-empty-setup-profile">
-                    Configure Profile
-                  </Button>
-                </Link>
-              }
-            />
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="overflow-hidden border-slate-800 bg-gradient-to-br from-slate-900/90 via-slate-900/60 to-slate-950/80 shadow-xl">
-          <CardContent className="p-5 sm:p-6">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              {/* Profile details */}
-              <div className="space-y-3 max-w-2xl">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 shadow-inner">
-                    <Building2 className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-bold text-white tracking-tight">{profile.name}</h3>
-                      <Badge variant="demo" className="text-[10px]">
-                        Demo Profile
-                      </Badge>
-                      <Badge variant="secondary" className="text-[10px]">
-                        {stageLabels[profile.stage]}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-slate-400 font-medium">{profile.industry}</p>
-                  </div>
-                </div>
-
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  {profile.shortDescription}
-                </p>
-
-                {/* Operating & Expansion Cities */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  <div className="flex items-start gap-2 rounded-lg border border-slate-800/80 bg-slate-950/50 p-2.5">
-                    <MapPin className="h-4 w-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                        Operating Base City
-                      </span>
-                      <span className="text-xs font-semibold text-slate-200">
-                        {profile.operatingCity}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2 rounded-lg border border-slate-800/80 bg-slate-950/50 p-2.5">
-                    <Target className="h-4 w-4 text-indigo-400 flex-shrink-0 mt-0.5" />
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                        Expansion Target Hubs
-                      </span>
-                      <span className="text-xs font-semibold text-slate-200">
-                        {profile.expansionCities.join(' · ')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            {/* Startup Brand Pill */}
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#151719] border border-[#252729]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFD27A] to-[#F5B94C] text-[#080A0B] font-black text-base shadow-sm">
+                S
               </div>
-
-              {/* Target Customer Pill & Edit */}
-              <div className="flex flex-col gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4 lg:w-80 flex-shrink-0">
-                <div>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                    Target Customer Persona
-                  </span>
-                  <p className="mt-1 text-xs text-slate-300 leading-relaxed font-medium">
-                    {profile.target_customer}
-                  </p>
-                </div>
-                <div className="border-t border-slate-800/80 pt-3 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-500">Profile calibration</span>
-                  <Link href="/settings">
-                    <Button variant="ghost" size="sm" className="h-7 text-xs text-indigo-400 hover:text-indigo-300">
-                      Edit Profile →
-                    </Button>
-                  </Link>
-                </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-sm font-bold text-[#F5F5F2] truncate">
+                  Shaurya&apos;s Startup
+                </h2>
+                <p className="text-[11px] text-[#858783] truncate">
+                  D2C | Consumer Goods
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+
+            {/* Profile Completion Bar */}
+            <div className="mt-5 space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[#858783]">Profile Completion</span>
+                <span className="font-mono font-bold text-[#F5B94C]">80%</span>
+              </div>
+              <div className="h-1.5 w-full bg-[#151719] rounded-full overflow-hidden border border-[#252729]">
+                <div
+                  className="h-full bg-gradient-to-r from-[#F5B94C] to-[#FFD27A] rounded-full"
+                  style={{ width: '80%' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Target Cities Selection */}
+          <div className="pt-5 border-t border-[#252729]/60">
+            <div className="flex items-center justify-between text-xs mb-2">
+              <span className="text-[#858783]">Target Cities</span>
+              <Link
+                href="/onboarding?returnTo=/dashboard"
+                className="text-[11px] text-[#F5B94C] hover:underline"
+              >
+                Manage
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {['Bangalore', 'Delhi NCR', 'Mumbai'].map((city) => (
+                <span
+                  key={city}
+                  className="rounded-lg border border-[#252729] bg-[#151719] px-2.5 py-1 text-xs text-[#F5F5F2] font-medium"
+                >
+                  {city}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          HIGH-LEVEL METRIC STAT CARDS
+          2. SECOND ROW: 4 SUMMARY METRIC CARDS WITH SPARKLINES
          ───────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          id="stat-top-fit-city"
-          title="Top Fit Assessment"
-          value={showEmptyState ? '—' : 'Pune (86/100)'}
-          subtitle={showEmptyState ? 'No cities evaluated' : 'Western Maharashtra Base'}
-          icon={MapPin}
-          iconColor="text-blue-400"
-          iconBg="bg-blue-500/10"
-          badge={showEmptyState ? undefined : 'Base City'}
-          isDemo={!showEmptyState}
-        />
-        <StatCard
-          id="stat-expansion-cities"
-          title="Target Cohort"
-          value={showEmptyState ? 0 : 3}
-          subtitle={showEmptyState ? 'Add target cities' : 'Bengaluru, Ahmedabad, Indore'}
-          icon={Target}
-          iconColor="text-indigo-400"
-          iconBg="bg-indigo-500/10"
-          trend={showEmptyState ? undefined : { value: '+2 from Q2', direction: 'up' }}
-          isDemo={!showEmptyState}
-        />
-        <StatCard
-          id="stat-intro-requests"
-          title="Local Introductions"
-          value={showEmptyState ? 0 : 4}
-          subtitle={showEmptyState ? 'No introductions' : '2 Accepted · 2 Pending'}
-          icon={Users}
-          iconColor="text-violet-400"
-          iconBg="bg-violet-500/10"
-          isDemo={!showEmptyState}
-        />
-        <StatCard
-          id="stat-validated-assumptions"
-          title="Market Proof Status"
-          value={showEmptyState ? '0 / 0' : `${supportedAssumptions} / ${assumptions.length}`}
-          subtitle={showEmptyState ? 'No assumptions logged' : `${challengedAssumptions} challenged · ${untestedAssumptions} untested`}
-          icon={ShieldCheck}
-          iconColor="text-amber-400"
-          iconBg="bg-amber-500/10"
-          isDemo={!showEmptyState}
-        />
+        {/* Metric 1: Cities Analyzed */}
+        <Card className="border-[#252729] bg-[#101314] p-4 flex flex-col justify-between hover:border-[#3A3D40] transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#151719] border border-[#252729] text-[#F5B94C]">
+                <Building2 className="h-4 w-4" />
+              </div>
+              <span className="text-xs text-[#858783]">Cities Analyzed</span>
+            </div>
+          </div>
+          <div className="mt-3 flex items-end justify-between">
+            <div>
+              <p className="text-2xl font-bold font-mono text-[#F5F5F2]">12</p>
+              <p className="text-[10px] text-[#F5B94C] font-medium mt-0.5">
+                ↑ 3 this month
+              </p>
+            </div>
+            {/* Golden Sparkline Line */}
+            <svg width="70" height="28" className="overflow-visible stroke-[#F5B94C] fill-none">
+              <path
+                d="M 0 22 Q 15 18, 30 14 T 50 10 T 70 4"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="70" cy="4" r="2.5" fill="#F5B94C" />
+            </svg>
+          </div>
+        </Card>
+
+        {/* Metric 2: Local Resources */}
+        <Card className="border-[#252729] bg-[#101314] p-4 flex flex-col justify-between hover:border-[#3A3D40] transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#151719] border border-[#252729] text-[#F5B94C]">
+                <Users className="h-4 w-4" />
+              </div>
+              <span className="text-xs text-[#858783]">Local Resources</span>
+            </div>
+          </div>
+          <div className="mt-3 flex items-end justify-between">
+            <div>
+              <p className="text-2xl font-bold font-mono text-[#F5F5F2]">248</p>
+              <p className="text-[10px] text-[#F5B94C] font-medium mt-0.5">
+                ↑ 28 this month
+              </p>
+            </div>
+            {/* Golden Bar Sparkline */}
+            <div className="flex items-end gap-1 h-7">
+              <span className="w-1.5 h-3 bg-[#9A6B22] rounded-sm" />
+              <span className="w-1.5 h-4 bg-[#9A6B22] rounded-sm" />
+              <span className="w-1.5 h-5 bg-[#F5B94C] rounded-sm" />
+              <span className="w-1.5 h-3 bg-[#9A6B22] rounded-sm" />
+              <span className="w-1.5 h-6 bg-[#FFD27A] rounded-sm" />
+            </div>
+          </div>
+        </Card>
+
+        {/* Metric 3: Experiments Run */}
+        <Card className="border-[#252729] bg-[#101314] p-4 flex flex-col justify-between hover:border-[#3A3D40] transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#151719] border border-[#252729] text-[#F5B94C]">
+                <FlaskConical className="h-4 w-4" />
+              </div>
+              <span className="text-xs text-[#858783]">Experiments Run</span>
+            </div>
+          </div>
+          <div className="mt-3 flex items-end justify-between">
+            <div>
+              <p className="text-2xl font-bold font-mono text-[#F5F5F2]">18</p>
+              <p className="text-[10px] text-[#F5B94C] font-medium mt-0.5">
+                ↑ 6 this month
+              </p>
+            </div>
+            {/* Golden Bar Sparkline */}
+            <div className="flex items-end gap-1 h-7">
+              <span className="w-1.5 h-2 bg-[#9A6B22] rounded-sm" />
+              <span className="w-1.5 h-4 bg-[#9A6B22] rounded-sm" />
+              <span className="w-1.5 h-5 bg-[#F5B94C] rounded-sm" />
+              <span className="w-1.5 h-6 bg-[#FFD27A] rounded-sm" />
+            </div>
+          </div>
+        </Card>
+
+        {/* Metric 4: Avg. Fit Score */}
+        <Card className="border-[#252729] bg-[#101314] p-4 flex flex-col justify-between hover:border-[#3A3D40] transition-colors">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#151719] border border-[#252729] text-[#F5B94C]">
+                <Target className="h-4 w-4" />
+              </div>
+              <span className="text-xs text-[#858783]">Avg. Fit Score</span>
+            </div>
+          </div>
+          <div className="mt-3 flex items-end justify-between">
+            <div>
+              <p className="text-2xl font-bold font-mono text-[#F5F5F2]">
+                72<span className="text-xs font-normal text-[#858783]"> /100</span>
+              </p>
+              <p className="text-[10px] text-[#F5B94C] font-medium mt-0.5">
+                ↑ 8% vs last month
+              </p>
+            </div>
+            {/* Golden Sparkline Line */}
+            <svg width="70" height="28" className="overflow-visible stroke-[#F5B94C] fill-none">
+              <path
+                d="M 0 20 Q 20 22, 35 15 T 55 12 T 70 5"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="70" cy="5" r="2.5" fill="#F5B94C" />
+            </svg>
+          </div>
+        </Card>
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          SECTION B: CITY ASSESSMENT SUMMARY
+          3. THIRD ROW: TOP RECOMMENDED CITIES + MARKET OPPORTUNITY MAP
          ───────────────────────────────────────────────────────────── */}
-      <section aria-labelledby="heading-city-assessment" className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 id="heading-city-assessment" className="text-base sm:text-lg font-bold text-white">
-                City Assessment Summary
-              </h3>
-              <Badge variant="demo" className="text-[10px]">
-                Simulated Fit Scores
-              </Badge>
-            </div>
-            <p className="text-xs text-slate-400">
-              Evaluated Indian hubs based on logistics density, target customer presence, and infrastructure overhead.
-            </p>
-          </div>
-          <Link href="/city-intelligence">
-            <Button variant="outline" size="sm" className="text-xs border-slate-700 text-slate-300">
-              View All City Comparisons
-              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </Button>
-          </Link>
-        </div>
-
-        {showEmptyState ? (
-          <EmptyState
-            icon={MapPin}
-            title="No city assessments created"
-            description="Run your first multi-city comparison to calculate objective Fit Scores from verifiable Indian market indicators."
-            action={
-              <Link href="/city-intelligence">
-                <Button size="sm">Create Comparison</Button>
-              </Link>
-            }
-          />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {cityAssessments.map((city) => (
-              <Card
-                key={city.id}
-                className="flex flex-col justify-between border-slate-800 bg-slate-900/60 transition-all hover:border-slate-700 hover:shadow-lg"
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <CardTitle className="text-base font-bold text-white">{city.cityName}</CardTitle>
-                        {city.isBaseCity && (
-                          <Badge variant="success" className="text-[9px] px-1.5 py-0">
-                            Base
-                          </Badge>
-                        )}
-                      </div>
-                      <CardDescription className="text-xs text-slate-400">
-                        {city.state} · {city.tier}
-                      </CardDescription>
-                    </div>
-                    <Badge
-                      variant={
-                        city.status === 'recommended'
-                          ? 'success'
-                          : city.status === 'promising'
-                            ? 'default'
-                            : 'warning'
-                      }
-                      className="text-[10px] capitalize"
-                    >
-                      {city.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-4 pt-0">
-                  {/* Visual Fit Score Gauge */}
-                  <div className="flex items-center justify-center py-1">
-                    <ScoreGauge
-                      score={city.fitScore}
-                      size="sm"
-                      label="Simulated Fit"
-                      showRating
-                      accessibleLabel={`${city.cityName} Fit Score: ${city.fitScore} out of 100`}
-                    />
-                  </div>
-
-                  {/* Evidence Coverage Indicator (Explicitly separate from Fit Score) */}
-                  <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-2.5">
-                    <CoverageBar
-                      coverage={city.evidenceCoverage}
-                      label="Evidence Coverage"
-                      size="sm"
-                    />
-                  </div>
-
-                  {/* Qualitative Drivers & Risks */}
-                  <div className="space-y-2 text-xs">
-                    <div>
-                      <span className="font-semibold text-slate-400">Primary Advantage:</span>
-                      <p className="text-slate-300 mt-0.5 leading-snug">{city.keyDriver}</p>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-rose-400/90">Critical Risk:</span>
-                      <p className="text-slate-400 mt-0.5 leading-snug">{city.topRisk}</p>
-                    </div>
-                  </div>
-
-                  {/* Footnote */}
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
-                    <span>Demo indicators</span>
-                    <Link
-                      href={`/city-intelligence`}
-                      className="text-indigo-400 hover:text-indigo-300 font-medium inline-flex items-center gap-1"
-                    >
-                      Inspect →
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          TWO-COLUMN SECTION: LOCAL CONNECT (C) & MARKET VALIDATION (D)
-         ───────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* ─── SECTION C: LOCAL CONNECT ACTIVITY ─── */}
-        <section aria-labelledby="heading-local-connect" className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Left Column (8 cols): Top Recommended Cities */}
+        <div className="lg:col-span-8 space-y-3.5">
+          <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <h3 id="heading-local-connect" className="text-base font-bold text-white">
-                  Local Connect Activity
-                </h3>
-                <Badge variant="demo" className="text-[10px]">
-                  Simulated Contacts
-                </Badge>
-              </div>
-              <p className="text-xs text-slate-400">
-                Recent introduction requests with distributors, retailers, and mentors.
+              <h2 className="text-base font-bold text-[#F5F5F2]">
+                Top Recommended Cities
+              </h2>
+              <p className="text-xs text-[#858783]">
+                Based on market fit, opportunity, and data coverage.
               </p>
             </div>
-            <Link href="/local-connect">
-              <Button variant="ghost" size="sm" className="text-xs text-indigo-400 hover:text-indigo-300">
-                View Network →
-              </Button>
+            <Link
+              href="/city-intelligence"
+              className="text-xs text-[#F5B94C] hover:text-[#FFD27A] flex items-center gap-1 font-medium"
+            >
+              <span>View All</span>
+              <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
-          {showEmptyState ? (
-            <EmptyState
-              icon={Users}
-              title="No introductions requested"
-              description="Discover vetted mentors, retail distributors, and ecosystem partners across target cities."
-              action={
-                <Link href="/local-connect">
-                  <Button size="sm">Browse Directory</Button>
-                </Link>
-              }
-            />
-          ) : (
-            <div className="space-y-3">
-              {introRequests.map((req) => (
-                <div
-                  key={req.id}
-                  className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 transition-all hover:border-slate-700"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-slate-200">{req.contactName}</span>
-                        <Badge
-                          variant={req.status === 'accepted' ? 'success' : 'warning'}
-                          className="text-[10px] capitalize"
-                        >
-                          {req.status} (Demo)
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-indigo-400 font-medium">
-                        {req.organization} · <span className="text-slate-400">{req.city}</span>
-                      </p>
-                    </div>
-                    <span className="text-[10px] text-slate-500 whitespace-nowrap">
-                      {formatDate(req.requestedAt)}
-                    </span>
-                  </div>
-
-                  <p className="mt-2 text-xs text-slate-300 leading-relaxed bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/60">
-                    <span className="font-semibold text-slate-400">Objective: </span>
-                    {req.purpose}
-                  </p>
-
-                  {req.notes && (
-                    <div className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-400">
-                      <Clock className="h-3 w-3 text-slate-500 flex-shrink-0" />
-                      <span>{req.notes}</span>
-                    </div>
-                  )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* City Card 1: Bangalore */}
+            <Card className="overflow-hidden border-[#252729] bg-[#101314] hover:border-[#3A3D40] transition-all flex flex-col justify-between">
+              <div>
+                {/* City Photo Header */}
+                <div className="relative h-28 w-full bg-[#151719] overflow-hidden">
+                  <Image
+                    src="/images/hero-city.jpg"
+                    alt="Bangalore Skyline"
+                    fill
+                    className="object-cover opacity-60 sepia-[0.3]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#101314] via-transparent to-transparent" />
+                  <span className="absolute top-2.5 left-2.5 flex h-6 w-6 items-center justify-center rounded-lg bg-[#080A0B]/80 border border-[#252729] text-[11px] font-mono font-bold text-[#F5B94C] backdrop-blur">
+                    #1
+                  </span>
                 </div>
-              ))}
-              <p className="text-[11px] text-slate-500 italic text-center">
-                Simulated demonstration requests — no actual emails or introductions are dispatched.
-              </p>
-            </div>
-          )}
-        </section>
 
-        {/* ─── SECTION D: MARKET VALIDATION PROGRESS ─── */}
-        <section aria-labelledby="heading-market-validation" className="space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 id="heading-market-validation" className="text-base font-bold text-white">
-                  Market Validation Progress
-                </h3>
-                <Badge variant="demo" className="text-[10px]">
-                  Sample Experiments
-                </Badge>
-              </div>
-              <p className="text-xs text-slate-400">
-                Ground-truth customer interviews, surveys, and pilot tests.
-              </p>
-            </div>
-            <Link href="/market-validation">
-              <Button variant="ghost" size="sm" className="text-xs text-emerald-400 hover:text-emerald-300">
-                View Experiments →
-              </Button>
-            </Link>
-          </div>
-
-          {showEmptyState ? (
-            <EmptyState
-              icon={FlaskConical}
-              title="No experiments configured"
-              description="Define structured field experiments to test willingness-to-pay and procurement hurdles."
-              action={
-                <Link href="/market-validation">
-                  <Button size="sm">New Experiment</Button>
-                </Link>
-              }
-            />
-          ) : (
-            <div className="space-y-3">
-              {experiments.map((exp) => (
-                <div
-                  key={exp.id}
-                  className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 transition-all hover:border-slate-700"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-slate-200">{exp.title}</span>
-                        <Badge
-                          variant={
-                            exp.status === 'complete'
-                              ? 'success'
-                              : exp.status === 'active'
-                                ? 'warning'
-                                : 'secondary'
-                          }
-                          className="text-[10px] capitalize"
-                        >
-                          {exp.status}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-slate-400">
-                        {exp.city} · <span className="capitalize">{exp.method.replace('-', ' ')}</span>
-                      </p>
-                    </div>
-                    <span className="text-[10px] text-slate-500 whitespace-nowrap">
-                      {formatDate(exp.updatedAt)}
-                    </span>
-                  </div>
-
-                  {/* Hypothesis & Metric */}
-                  <div className="mt-2.5 space-y-1.5 text-xs">
-                    <div className="bg-slate-950/40 p-2.5 rounded-lg border border-slate-800/60">
-                      <span className="font-semibold text-slate-400">Hypothesis: </span>
-                      <span className="text-slate-300">{exp.hypothesis}</span>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-[11px]">
-                      <div>
-                        <span className="text-slate-500">Target: </span>
-                        <span className="text-slate-300">{exp.metricTarget}</span>
-                      </div>
-                      {exp.metricActual && (
-                        <div className="font-medium text-emerald-400">
-                          <span>Result: </span>
-                          <span>{exp.metricActual}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                      <span className="text-slate-400 font-medium">Next Action:</span>
-                      <span className="text-slate-300 text-right truncate max-w-[280px]">
-                        {exp.nextAction}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              <p className="text-[11px] text-slate-500 italic text-center">
-                Simulated experiments for prototype evaluation — no real database updates applied.
-              </p>
-            </div>
-          )}
-        </section>
-      </div>
-
-      {/* ─────────────────────────────────────────────────────────────
-          SECTION E: MARKET PROOF PREVIEW
-         ───────────────────────────────────────────────────────────── */}
-      <section aria-labelledby="heading-market-proof" className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-800 pb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 id="heading-market-proof" className="text-base sm:text-lg font-bold text-white">
-                Market Proof Loop Preview
-              </h3>
-              <Badge variant="demo" className="text-[10px]">
-                Signature Differentiator
-              </Badge>
-            </div>
-            <p className="text-xs text-slate-400">
-              Traces whether early city assessments are supported or challenged by real-world field outcomes.
-            </p>
-          </div>
-          <Link href="/market-proof">
-            <Button variant="outline" size="sm" className="text-xs border-amber-500/30 text-amber-300 hover:bg-amber-500/10">
-              Open Market Proof Matrix
-              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </Button>
-          </Link>
-        </div>
-
-        {showEmptyState ? (
-          <EmptyState
-            icon={ShieldCheck}
-            title="No market proof records"
-            description="Link city scores to real customer validation experiments to see which assumptions hold true."
-            action={
-              <Link href="/market-proof">
-                <Button size="sm">Initialize Proof Loop</Button>
-              </Link>
-            }
-          />
-        ) : (
-          <div className="space-y-4">
-            {/* Assumption Matrix Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              {assumptions.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/60 p-4 transition-all hover:border-slate-700"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                        {item.category.replace('-', ' ')}
-                      </span>
-                      <Badge
-                        variant={
-                          item.status === 'supported'
-                            ? 'success'
-                            : item.status === 'challenged'
-                              ? 'warning'
-                              : 'secondary'
-                        }
-                        className="text-[10px] capitalize"
-                      >
-                        {item.status}
-                      </Badge>
-                    </div>
-
-                    <p className="text-xs font-semibold text-slate-200 leading-snug">
-                      &ldquo;{item.statement}&rdquo;
-                    </p>
-
-                    <p className="text-[11px] text-slate-400 leading-relaxed bg-slate-950/50 p-2 rounded border border-slate-800/80">
-                      {item.evidenceSummary}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-500">
-                    <span className="capitalize">Source: {item.linkedModule.replace('-', ' ')}</span>
-                    <span className="text-indigo-400 font-medium">Traceable</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Market Proof Workflow Architecture Diagram */}
-            <Card className="border-slate-800 bg-slate-900/40">
-              <CardContent className="p-5">
-                <div className="flex flex-col gap-3">
+                <div className="p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                      Traceability Architecture
-                    </span>
-                    <span className="text-[11px] text-slate-500">
-                      Verifiable data integrity · Zero synthetic fabrication
+                    <h3 className="text-base font-bold text-[#F5F5F2]">Bangalore</h3>
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-950/40 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                      High Opportunity
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-2">
-                    <div className="rounded-lg border border-blue-900/40 bg-blue-950/20 p-3 flex flex-col justify-between">
-                      <div>
-                        <span className="text-[10px] font-bold text-blue-400">STEP 1</span>
-                        <h4 className="text-xs font-bold text-slate-200 mt-1">City Intelligence</h4>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Evaluates census, logistics, and demographic indicators; records baseline expansion assumptions.
-                        </p>
-                      </div>
-                      <span className="mt-2 text-[10px] text-blue-400 font-medium">Sourced Data</span>
+                  {/* Fit Score & Gauge */}
+                  <div>
+                    <div className="flex items-baseline justify-between text-xs mb-1">
+                      <span className="text-[11px] text-[#858783]">Fit Score</span>
+                      <span className="font-mono font-bold text-sm text-[#F5F5F2]">
+                        82<span className="text-[10px] text-[#858783]">/100</span>
+                      </span>
                     </div>
-
-                    <div className="rounded-lg border border-violet-900/40 bg-violet-950/20 p-3 flex flex-col justify-between">
-                      <div>
-                        <span className="text-[10px] font-bold text-violet-400">STEP 2</span>
-                        <h4 className="text-xs font-bold text-slate-200 mt-1">Local Connect</h4>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Locates verified mentors, pilot customers, and retail distributors to interrogate assumptions.
-                        </p>
-                      </div>
-                      <span className="mt-2 text-[10px] text-violet-400 font-medium">Ecosystem Network</span>
+                    <div className="h-1.5 w-full bg-[#151719] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#F5B94C] to-[#FFD27A] rounded-full"
+                        style={{ width: '82%' }}
+                      />
                     </div>
+                  </div>
 
-                    <div className="rounded-lg border border-emerald-900/40 bg-emerald-950/20 p-3 flex flex-col justify-between">
-                      <div>
-                        <span className="text-[10px] font-bold text-emerald-400">STEP 3</span>
-                        <h4 className="text-xs font-bold text-slate-200 mt-1">Market Validation</h4>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Executes interviews and surveys to record measurable real-world outcomes.
-                        </p>
-                      </div>
-                      <span className="mt-2 text-[10px] text-emerald-400 font-medium">Empirical Evidence</span>
+                  {/* 4 Criteria Sub-scores */}
+                  <div className="space-y-1.5 pt-1 text-xs">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Market Size</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">85</span>
                     </div>
-
-                    <div className="rounded-lg border border-amber-900/40 bg-amber-950/20 p-3 flex flex-col justify-between">
-                      <div>
-                        <span className="text-[10px] font-bold text-amber-400">STEP 4</span>
-                        <h4 className="text-xs font-bold text-slate-200 mt-1">Market Proof</h4>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Correlates recorded evidence directly back to the original expansion hypothesis.
-                        </p>
-                      </div>
-                      <span className="mt-2 text-[10px] text-amber-400 font-medium">Traceable Loop</span>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Competition</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">70</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Talent Availability</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">90</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Cost of Operations</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">65</span>
                     </div>
                   </div>
                 </div>
-              </CardContent>
+              </div>
+
+              <div className="p-4 pt-0">
+                <Link href="/city-intelligence/comp-001">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs border-[#252729] bg-[#151719] text-[#F5F5F2] hover:bg-[#1A1D20] hover:border-[#F5B94C]/40 hover:text-[#F5B94C] rounded-xl"
+                  >
+                    <span>View Full Analysis</span>
+                    <ArrowRight className="h-3 w-3 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+
+            {/* City Card 2: Delhi NCR */}
+            <Card className="overflow-hidden border-[#252729] bg-[#101314] hover:border-[#3A3D40] transition-all flex flex-col justify-between">
+              <div>
+                {/* City Photo Header */}
+                <div className="relative h-28 w-full bg-[#151719] overflow-hidden">
+                  <Image
+                    src="/images/hero-city.jpg"
+                    alt="Delhi NCR"
+                    fill
+                    className="object-cover opacity-60 sepia-[0.3]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#101314] via-transparent to-transparent" />
+                  <span className="absolute top-2.5 left-2.5 flex h-6 w-6 items-center justify-center rounded-lg bg-[#080A0B]/80 border border-[#252729] text-[11px] font-mono font-bold text-[#F5B94C] backdrop-blur">
+                    #2
+                  </span>
+                </div>
+
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-[#F5F5F2]">Delhi NCR</h3>
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-950/40 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                      High Opportunity
+                    </span>
+                  </div>
+
+                  {/* Fit Score & Gauge */}
+                  <div>
+                    <div className="flex items-baseline justify-between text-xs mb-1">
+                      <span className="text-[11px] text-[#858783]">Fit Score</span>
+                      <span className="font-mono font-bold text-sm text-[#F5F5F2]">
+                        76<span className="text-[10px] text-[#858783]">/100</span>
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#151719] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#F5B94C] to-[#FFD27A] rounded-full"
+                        style={{ width: '76%' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 4 Criteria Sub-scores */}
+                  <div className="space-y-1.5 pt-1 text-xs">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Market Size</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">80</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Competition</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">65</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Talent Availability</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">75</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Cost of Operations</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">70</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 pt-0">
+                <Link href="/city-intelligence/comp-001">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs border-[#252729] bg-[#151719] text-[#F5F5F2] hover:bg-[#1A1D20] hover:border-[#F5B94C]/40 hover:text-[#F5B94C] rounded-xl"
+                  >
+                    <span>View Full Analysis</span>
+                    <ArrowRight className="h-3 w-3 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+
+            {/* City Card 3: Mumbai */}
+            <Card className="overflow-hidden border-[#252729] bg-[#101314] hover:border-[#3A3D40] transition-all flex flex-col justify-between">
+              <div>
+                {/* City Photo Header */}
+                <div className="relative h-28 w-full bg-[#151719] overflow-hidden">
+                  <Image
+                    src="/images/hero-city.jpg"
+                    alt="Mumbai Sea Link"
+                    fill
+                    className="object-cover opacity-60 sepia-[0.3]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#101314] via-transparent to-transparent" />
+                  <span className="absolute top-2.5 left-2.5 flex h-6 w-6 items-center justify-center rounded-lg bg-[#080A0B]/80 border border-[#252729] text-[11px] font-mono font-bold text-[#F5B94C] backdrop-blur">
+                    #3
+                  </span>
+                </div>
+
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-[#F5F5F2]">Mumbai</h3>
+                    <span className="rounded-full border border-[#9A6B22]/40 bg-[#9A6B22]/20 px-2 py-0.5 text-[10px] font-semibold text-[#FFD27A]">
+                      Medium Opportunity
+                    </span>
+                  </div>
+
+                  {/* Fit Score & Gauge */}
+                  <div>
+                    <div className="flex items-baseline justify-between text-xs mb-1">
+                      <span className="text-[11px] text-[#858783]">Fit Score</span>
+                      <span className="font-mono font-bold text-sm text-[#F5F5F2]">
+                        74<span className="text-[10px] text-[#858783]">/100</span>
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#151719] rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#F5B94C] to-[#FFD27A] rounded-full"
+                        style={{ width: '74%' }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 4 Criteria Sub-scores */}
+                  <div className="space-y-1.5 pt-1 text-xs">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Market Size</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">78</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Competition</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">72</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Talent Availability</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">70</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#858783]">Cost of Operations</span>
+                      <span className="font-mono font-medium text-[#F5F5F2]">68</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 pt-0">
+                <Link href="/city-intelligence/comp-001">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs border-[#252729] bg-[#151719] text-[#F5F5F2] hover:bg-[#1A1D20] hover:border-[#F5B94C]/40 hover:text-[#F5B94C] rounded-xl"
+                  >
+                    <span>View Full Analysis</span>
+                    <ArrowRight className="h-3 w-3 ml-1" />
+                  </Button>
+                </Link>
+              </div>
             </Card>
           </div>
-        )}
-      </section>
+        </div>
+
+        {/* Right Column (4 cols): Market Opportunity Map */}
+        <div className="lg:col-span-4">
+          <MarketOpportunityMap />
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          4. BOTTOM ROW: VALIDATION PROGRESS + RECENT ACTIVITY + QUICK ACTIONS
+         ───────────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5">
+        {/* Market Validation Progress (4 cols) */}
+        <div className="lg:col-span-4">
+          <ValidationProgressGauge />
+        </div>
+
+        {/* Recent Activity Feed (5 cols) */}
+        <div className="lg:col-span-5">
+          <Card className="border-[#252729] bg-[#101314] shadow-xl h-full flex flex-col justify-between">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold text-[#F5F5F2]">
+                  Recent Activity
+                </CardTitle>
+                <Link
+                  href="/market-proof"
+                  className="text-xs text-[#F5B94C] hover:text-[#FFD27A] flex items-center gap-1 font-medium"
+                >
+                  <span>View all</span>
+                  <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-3 pt-1">
+              {[
+                {
+                  title: 'Market analysis completed',
+                  desc: 'Bangalore — E-commerce (D2C)',
+                  time: '2h ago',
+                  icon: Target,
+                  color: 'text-[#F5B94C]',
+                  bg: 'bg-[#F5B94C]/10',
+                },
+                {
+                  title: 'New resource added',
+                  desc: 'Retailer — Koramangala, Bangalore',
+                  time: '5h ago',
+                  icon: Users,
+                  color: 'text-[#FFD27A]',
+                  bg: 'bg-[#FFD27A]/10',
+                },
+                {
+                  title: 'Experiment result updated',
+                  desc: 'Customer interviews — 12 responses',
+                  time: '1d ago',
+                  icon: FlaskConical,
+                  color: 'text-[#F5B94C]',
+                  bg: 'bg-[#F5B94C]/10',
+                },
+                {
+                  title: 'Startup profile updated',
+                  desc: 'Product & target market defined',
+                  time: '2d ago',
+                  icon: Building2,
+                  color: 'text-[#B4B5B2]',
+                  bg: 'bg-[#151719]',
+                },
+              ].map((act, i) => {
+                const Icon = act.icon
+                return (
+                  <div
+                    key={i}
+                    className="flex items-start justify-between gap-3 p-2.5 rounded-xl border border-[#252729]/60 bg-[#151719]/40 hover:border-[#3A3D40] transition-colors"
+                  >
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${act.bg} ${act.color} shrink-0 mt-0.5`}>
+                        <Icon className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-[#F5F5F2] truncate">
+                          {act.title}
+                        </p>
+                        <p className="text-[11px] text-[#858783] truncate">
+                          {act.desc}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-[#858783] whitespace-nowrap font-mono">
+                      {act.time}
+                    </span>
+                  </div>
+                )
+              })}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions Grid (3 cols) */}
+        <div className="lg:col-span-3">
+          <Card className="border-[#252729] bg-[#101314] shadow-xl h-full flex flex-col justify-between">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold text-[#F5F5F2]">
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="grid grid-cols-2 gap-2.5 pt-1">
+              <Link href="/city-intelligence/new" className="block">
+                <div className="flex flex-col items-center text-center p-3 rounded-xl border border-[#252729] bg-[#151719] hover:border-[#F5B94C]/40 hover:bg-[#1A1D20] transition-all cursor-pointer h-full justify-center group">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5B94C]/10 text-[#F5B94C] mb-1.5 group-hover:scale-105 transition-transform">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  <span className="text-xs font-semibold text-[#F5F5F2] line-clamp-1">
+                    Analyze a City
+                  </span>
+                  <span className="text-[10px] text-[#858783] mt-0.5">
+                    Get market insights
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/local-connect" className="block">
+                <div className="flex flex-col items-center text-center p-3 rounded-xl border border-[#252729] bg-[#151719] hover:border-[#F5B94C]/40 hover:bg-[#1A1D20] transition-all cursor-pointer h-full justify-center group">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FFD27A]/10 text-[#FFD27A] mb-1.5 group-hover:scale-105 transition-transform">
+                    <Users className="h-4 w-4" />
+                  </div>
+                  <span className="text-xs font-semibold text-[#F5F5F2] line-clamp-1">
+                    Find Resources
+                  </span>
+                  <span className="text-[10px] text-[#858783] mt-0.5">
+                    Connect with partners
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/market-validation/new" className="block">
+                <div className="flex flex-col items-center text-center p-3 rounded-xl border border-[#252729] bg-[#151719] hover:border-[#F5B94C]/40 hover:bg-[#1A1D20] transition-all cursor-pointer h-full justify-center group">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5B94C]/10 text-[#F5B94C] mb-1.5 group-hover:scale-105 transition-transform">
+                    <FlaskConical className="h-4 w-4" />
+                  </div>
+                  <span className="text-xs font-semibold text-[#F5F5F2] line-clamp-1">
+                    Create Experiment
+                  </span>
+                  <span className="text-[10px] text-[#858783] mt-0.5">
+                    Validate your idea
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/market-proof" className="block">
+                <div className="flex flex-col items-center text-center p-3 rounded-xl border border-[#252729] bg-[#151719] hover:border-[#F5B94C]/40 hover:bg-[#1A1D20] transition-all cursor-pointer h-full justify-center group">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FFD27A]/10 text-[#FFD27A] mb-1.5 group-hover:scale-105 transition-transform">
+                    <ShieldCheck className="h-4 w-4" />
+                  </div>
+                  <span className="text-xs font-semibold text-[#F5F5F2] line-clamp-1">
+                    View Proof Loop
+                  </span>
+                  <span className="text-[10px] text-[#858783] mt-0.5">
+                    See complete analysis
+                  </span>
+                </div>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </PageShell>
   )
 }
